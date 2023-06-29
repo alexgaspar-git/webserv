@@ -74,7 +74,9 @@ int main() {
                 std::cerr << "Failed to accept connection" << std::endl;
                 continue;
             }
-
+            char buffer[30000] = {0};
+            int valread = read( clientSocket , buffer, 30000);
+            printf("%s",buffer);
             // Set client socket to non-blocking mode
             fcntl(clientSocket, F_SETFL, O_NONBLOCK);
 
