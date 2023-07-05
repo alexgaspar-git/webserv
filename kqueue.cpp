@@ -7,9 +7,25 @@
 #include <fcntl.h> // Include fcntl header
 #include <iostream>
 #include <string>
+#include <fstream>
 
-const int MAX_EVENTS = 10;
+const int MAX_EVENTS = 1;
 const int PORT = 8080;
+
+std::string getHtml() {
+    std::string result = "HTTP/1.1 200 OK\r\n";
+    std::ifstream input("index.html");
+    if (!input.is_open()) {
+		std::cout << "Unable to open file" << std::endl;
+		return NULL;
+	}
+    std::string content((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+    size_t contentLen = content.size();
+    result += "Content-Length: " + std::to_string(contentLen) + "\r\n\r\n";
+    result += content;
+    return result;
+}
+
 
 void handleClient(int clientSocket) {
     // Read the request from the client
@@ -20,7 +36,8 @@ void handleClient(int clientSocket) {
         std::cout << "Received request:\n" << request << std::endl;
 
         // Send a simple response
-        std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 14\r\n\r\n<h1>Hello, World!</h1>";
+        std::string response = getHtml();
+
         write(clientSocket, response.c_str(), response.length());
     }
 
@@ -85,7 +102,6 @@ int main() {
             std::cerr << "Failed to wait for events." << std::endl;
             break;
         }
-
         // Handle each event
         for (int i = 0; i < numEvents; ++i) {
             int fd = events[i].ident;
