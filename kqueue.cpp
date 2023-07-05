@@ -14,7 +14,7 @@ const int PORT = 8080;
 
 std::string getHtml() {
     std::string result = "HTTP/1.1 200 OK\r\n";
-    std::ifstream input("index.html");
+    std::ifstream input("www/index.html");
     if (!input.is_open()) {
 		std::cout << "Unable to open file" << std::endl;
 		return NULL;
