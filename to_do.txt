@@ -1,0 +1,7 @@
+finir socket
+se renseigmer sur cgi
+commencer parsing des requetes
+faire .conf
+
+plus tard
+page html erreur
