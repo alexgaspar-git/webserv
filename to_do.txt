@@ -1,4 +1,4 @@
-finir socket
+finir socket (remplacer tout les msg erreur par try catch)
 se renseigmer sur cgi
 commencer parsing des requetes
 faire .conf
