@@ -3,9 +3,13 @@
 
 #include <iostream>
 #include <map>
+#include <vector>
 #include <sstream>
 #include <string>
+#include <fstream>
 
+#define SITEPATH "www"
+#define HTTPVER "HTTP/1.1 "
 
 class requestHandler {
 private:
@@ -16,6 +20,11 @@ private:
 public:
     requestHandler(std::string const request);
     ~requestHandler();
+    void getFirstLine(std::string const line);
+    std::map<std::string, std::string> getMap();
+    std::string handleGet();
+    std::string makeGetResponse();
+    std::string makeErrorResponse();
 };
 
 #endif
