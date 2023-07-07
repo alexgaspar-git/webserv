@@ -8,8 +8,9 @@
 #include <string>
 #include <fstream>
 
-#define SITEPATH "www"
 #define HTTPVER "HTTP/1.1 "
+#define SITEPATH "www"
+#define ERRORPATH "www/error/"
 
 class requestHandler {
 private:
@@ -22,9 +23,10 @@ public:
     ~requestHandler();
     void getFirstLine(std::string const line);
     std::map<std::string, std::string> getMap();
+    std::string handleRequest();
     std::string handleGet();
     std::string makeGetResponse();
-    std::string makeErrorResponse();
+    std::string makeErrorResponse(int err);
 };
 
 #endif

@@ -1,7 +1,7 @@
 NAME = webserv
 
 # SRC = $(wildcard src/*.cpp)
-SRC =	src/main2.cpp\
+SRC =	src/main.cpp\
 		src/requestHandler.cpp\
 		src/serverSocket.cpp
 

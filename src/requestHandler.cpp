@@ -38,20 +38,32 @@ std::map<std::string, std::string> requestHandler::getMap() {
     return _req;
 }
 
-std::string requestHandler::handleGet() {
-    std::string response = makeGetResponse();
-    if (response.empty()) {
-        response = makeErrorResponse();
+std::string requestHandler::handleRequest() {
+    std::string method = _req["method"];
+    if (method.compare("GET")) {
+        return handleGet();
+    } else {
+        std::cout << "waddafak" << std::endl;
     }
-    return response;
 }
 
-std::string requestHandler::makeGetResponse() {
-    std::ifstream input(SITEPATH + _req["path"]);
-    if (!input.is_open()) {
-        return "";
+std::string requestHandler::handleGet() {
+    return makeGetResponse();
+}
+
+std::string getStatusCode(int err) {
+    switch (err) {
+        case 200:
+            return "200 OK";
+        case 404:
+            return "404 Not Found";
+        default:
+            return "?";
     }
-    std::string result = "HTTP/1.1 200 OK\r\n";
+}
+
+std::string constructGetResponse(int status, std::ifstream &input) {
+    std::string result =  HTTPVER + getStatusCode(status) + "\r\n";
     std::string content((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
     size_t contentLen = content.size();
     result += "Content-Length: " + std::to_string(contentLen) + "\r\n\r\n";
@@ -59,14 +71,24 @@ std::string requestHandler::makeGetResponse() {
     return result;
 }
 
-std::string requestHandler::makeErrorResponse() {
-    std::ifstream input("www/error/404.html");
-    std::string errorResponse = "HTTP/1.1 404 Not Found\r\n";
-    std::string content((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-    size_t contentLen = content.size();
-    errorResponse += "Content-Length: " + std::to_string(contentLen) + "\r\n\r\n";
-    errorResponse += content;
-    return errorResponse;
+std::string intToString(int value) {
+    std::stringstream ss;
+    ss << value;
+    return ss.str();
 }
 
 
+std::string requestHandler::makeGetResponse() {
+    std::ifstream input(SITEPATH + _req["path"]);
+    if (!input.is_open()) {
+        std::ifstream input(ERRORPATH + intToString(404) + ".html");
+        return constructGetResponse(404, input);
+    }
+    return constructGetResponse(200, input);
+}
+
+
+std::string requestHandler::makeErrorResponse(int err) {
+    std::ifstream input(ERRORPATH + intToString(err) + ".html");
+    return constructGetResponse(err, input);
+}
