@@ -1,7 +1,15 @@
 #include "../includes/serverSocket.hpp"
 #include "../includes/requestHandler.hpp"
 
-int main() {
+int main(int argc, char **argv) {
+	if (argc < 2){
+		std::cerr << "need a configuration file to launch the webserv." << std::endl;
+		return (1);
+	}
+	if (argc > 2){
+		std::cerr << "need only one configuration file to launch the webserv." << std::endl;
+		return (1);
+	}
 	int new_events;
 	serverSocket srv(8080);
 	srv.init_kqueue();

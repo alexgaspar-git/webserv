@@ -38,14 +38,14 @@ std::map<std::string, std::string> requestHandler::getMap() {
     return _req;
 }
 
-std::string requestHandler::handleRequest() {
-    std::string method = _req["method"];
-    if (method.compare("GET")) {
-        return handleGet();
-    } else {
-        std::cout << "waddafak" << std::endl;
-    }
-}
+// std::string requestHandler::handleRequest() {
+//     std::string method = _req["method"];
+//     if (method.compare("GET")) {
+//         return handleGet();
+//     } else {
+//         std::cout << "waddafak" << std::endl;
+//     }
+// }
 
 std::string requestHandler::handleGet() {
     return makeGetResponse();
