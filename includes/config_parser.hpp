@@ -3,6 +3,7 @@
  #define CONFIG_PARSER_HPP
 
 # include <iostream>
+# include <fstream>
 
 class config_parser
 {
