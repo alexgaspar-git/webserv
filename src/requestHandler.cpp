@@ -38,17 +38,40 @@ std::map<std::string, std::string> requestHandler::getMap() {
     return _req;
 }
 
-// std::string requestHandler::handleRequest() {
-//     std::string method = _req["method"];
-//     if (method.compare("GET")) {
-//         return handleGet();
-//     } else {
-//         std::cout << "waddafak" << std::endl;
-//     }
-// }
+int findSecondOccurrence(const std::string& str, char target) {
+    std::string::size_type firstIndex = std::string::npos;
+    std::string::size_type secondIndex = std::string::npos;
 
-std::string requestHandler::handleGet() {
-    return makeGetResponse();
+    for (std::string::size_type i = 0; i < str.length(); i++) {
+        if (str[i] == target) {
+            if (firstIndex == std::string::npos)
+                firstIndex = i;
+            else {
+                secondIndex = i;
+                break;
+            }
+        }
+    }
+    return secondIndex;
+}
+
+
+int isCGI(std::string const path) {
+    std::string test = path.substr(0, findSecondOccurrence(path, '/'));
+    return test.compare("/cgi-bin");
+}
+
+std::string requestHandler::handleRequest() {
+    std::string path = _req["path"];
+    if (isCGI(path) == 0) {
+        //handle CGI
+        std::cout << "not yet honeybuns.." << std::endl;
+        return "";
+    } else {
+        if (_req["method"].compare("GET") != 0)
+            return makeErrorResponse(403);
+        return makeGetResponse();
+    }
 }
 
 std::string getStatusCode(int err) {

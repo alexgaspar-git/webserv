@@ -80,9 +80,12 @@ void serverSocket::handle_request(int clientSocket) {
     ssize_t bytesRead = read(clientSocket, buffer, sizeof(buffer));
     if (bytesRead > 0) {
         std::string request(buffer, bytesRead);
-        // std::cout << "Received request:\n" << request << std::endl;
+		// std::cout << std::endl;
+		// std::cout << "-------- REQUEST RECEIVED --------" << std::endl;
+		// std::cout << request;
+		// std::cout << "----------------------------------" << std::endl;
         requestHandler test(request);
-        std::string response = test.handleGet();
+        std::string response = test.handleRequest();
         write(clientSocket, response.c_str(), response.length());
     }
     close(clientSocket);

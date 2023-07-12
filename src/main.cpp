@@ -2,6 +2,7 @@
 #include "../includes/requestHandler.hpp"
 
 int main(int argc, char **argv) {
+	(void)argv;
 	if (argc < 2){
 		std::cerr << "need a configuration file to launch the webserv." << std::endl;
 		return (1);
@@ -16,7 +17,7 @@ int main(int argc, char **argv) {
 
 	while (1) {
 		int tmp_fd;
-		struct kevent events[10];
+		struct kevent events[4];
 		new_events = kevent(srv.getKqueue_fd(), NULL, 0, events, 10, NULL);//protection kevent ?
 		for (int i = 0; i < new_events; i++) {
 			tmp_fd = events[i].ident;

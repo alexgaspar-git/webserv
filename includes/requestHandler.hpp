@@ -24,7 +24,6 @@ public:
     void getFirstLine(std::string const line);
     std::map<std::string, std::string> getMap();
     std::string handleRequest();
-    std::string handleGet();
     std::string makeGetResponse();
     std::string makeErrorResponse(int err);
 };

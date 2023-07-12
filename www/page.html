@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1 style="font-size: 120px"> rooby dooby doo </h1>
-    <a href="index.html"> back </a>
+    <form action="/cgi-bin/shownames.py" method="GET">
+        <label for="fname">First name:</label>
+        <input type="text" id="fname" name="fname"><br><br>
+        <label for="lname">Last name:</label>
+        <input type="text" id="lname" name="lname"><br><br>
+        <input type="submit" value="Submit">
+    </form> 
 </body>
 </html>
