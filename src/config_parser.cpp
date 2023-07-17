@@ -1,8 +1,12 @@
 
 #include "config_parser.hpp"
 
+int check_conf(std::string conf) {
+	std::string tmp;
+}
+
 config_parser::config_parser(std::string conf_file) {
-	std::ifstream input("read.cp");
+	std::ifstream input(conf_file);
     if (!input.is_open()) {
         std::cout << ".conf file doesn't exist." << std::endl;
 		exit (1);//throw error
