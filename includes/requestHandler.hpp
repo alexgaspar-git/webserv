@@ -12,6 +12,9 @@
 #define SITEPATH "www"
 #define ERRORPATH "www/error/"
 
+#include "CGIHandler.hpp"
+
+
 class requestHandler {
 private:
     std::map<std::string, std::string>  _req;
@@ -21,11 +24,13 @@ private:
 public:
     requestHandler(std::string const request);
     ~requestHandler();
-    void getFirstLine(std::string const line);
+    void getFirstLine(std::string const &line);
     std::map<std::string, std::string> getMap();
     std::string handleRequest();
     std::string makeGetResponse();
     std::string makeErrorResponse(int err);
 };
+
+std::string getStatusCode(int err);
 
 #endif

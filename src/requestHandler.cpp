@@ -1,6 +1,6 @@
 #include "../includes/requestHandler.hpp"
 
-requestHandler::requestHandler(std::string const request) {
+requestHandler::requestHandler(std::string const request) : _req() {
     std::istringstream iss(request);
     std::string line;
     bool isFirstLine = true;
@@ -21,7 +21,7 @@ requestHandler::requestHandler(std::string const request) {
 
 requestHandler::~requestHandler() {}
 
-void requestHandler::getFirstLine(std::string const line) {
+void requestHandler::getFirstLine(std::string const &line) {
     std::string keys[3] = {"method", "path", "version"};
     std::istringstream iss(line);
     std::string word;
@@ -38,7 +38,7 @@ std::map<std::string, std::string> requestHandler::getMap() {
     return _req;
 }
 
-int findSecondOccurrence(const std::string& str, char target) {
+std::string::size_type findSecondOccurrence(const std::string& str, char target) {
     std::string::size_type firstIndex = std::string::npos;
     std::string::size_type secondIndex = std::string::npos;
 
@@ -64,9 +64,8 @@ int isCGI(std::string const path) {
 std::string requestHandler::handleRequest() {
     std::string path = _req["path"];
     if (isCGI(path) == 0) {
-        //handle CGI
-        std::cout << "not yet honeybuns.." << std::endl;
-        return "";
+        CGIHandler jeff(_req);
+        return jeff.execCGI();;
     } else {
         if (_req["method"].compare("GET") != 0)
             return makeErrorResponse(403);

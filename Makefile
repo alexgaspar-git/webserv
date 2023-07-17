@@ -3,7 +3,8 @@ NAME = webserv
 # SRC = $(wildcard src/*.cpp)
 SRC =	src/main.cpp\
 		src/requestHandler.cpp\
-		src/serverSocket.cpp
+		src/serverSocket.cpp\
+		src/CGIHandler.cpp
 
 CXX = c++
 
