@@ -13,6 +13,7 @@
 #define ERRORPATH "www/error/"
 
 #include "CGIHandler.hpp"
+#include "utils.hpp"
 
 
 class requestHandler {

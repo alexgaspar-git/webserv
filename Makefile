@@ -4,7 +4,8 @@ NAME = webserv
 SRC =	src/main.cpp\
 		src/requestHandler.cpp\
 		src/serverSocket.cpp\
-		src/CGIHandler.cpp
+		src/CGIHandler.cpp\
+		src/utils.cpp
 
 CXX = c++
 

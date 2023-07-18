@@ -5,7 +5,9 @@
 #include <map>
 #include <string>
 #include <unistd.h>
+
 #include "requestHandler.hpp"
+#include "utils.hpp"
 
 class CGIHandler {
 private:
@@ -14,13 +16,14 @@ private:
     const char *_path;
     const char **_argv;
     const char **_env;
-public:
-    CGIHandler(std::map<std::string, std::string> const &request);
-    std::string execCGI();
     const char **getArgv();
     const char **getEnv();
+public:
+    CGIHandler(std::map<std::string, std::string> const &request);
+    ~CGIHandler();
+    std::string initCGI();
+    bool execCGI();
     std::string constructResponse();
-    std::string getOutput();
 };
 
 
