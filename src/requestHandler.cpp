@@ -3,22 +3,35 @@
 requestHandler::requestHandler(std::string const request) : _req() {
     std::istringstream iss(request);
     std::string line;
+    std::string body;
     bool isFirstLine = true;
+    bool isInBody = false;
     while (std::getline(iss, line)) {
         if (isFirstLine) {
             getFirstLine(line);
             isFirstLine = false;
             continue;
         }
-        if (line.size() != 1) {
+        std::string::size_type colonPos = line.find(":");
+        std::string key = line.substr(0, colonPos);
+        std::string val = line.substr(colonPos + 1);
+        _req[key] = val;
+        if (line.find("\r\n") && line.size() == 1 && isInBody == false) {
             std::cout << line << std::endl;
-            std::string::size_type colonPos = line.find(":");
-            std::string key = line.substr(0, colonPos);
-            std::string val = line.substr(colonPos + 1);
-            _req[key] = val;
+            isInBody = true;
+            std::getline(iss, line);
         }
+        if (isInBody) {
+            body += line;
+        }
+        std::cout << line << std::endl;
     }
+    _req["body"] = body;
+    std::cout << "dabody:::" << _req["body"] << std::endl;
 }
+
+
+//trouve une maniere plus intelligente de skip les \r\n mec!!!!!!!!
 
 requestHandler::~requestHandler() {}
 
