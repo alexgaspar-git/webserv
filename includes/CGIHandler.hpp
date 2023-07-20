@@ -24,6 +24,7 @@ public:
     std::string initCGI();
     bool execCGI();
     std::string constructResponse();
+    void parseBody();
 };
 
 

@@ -12,22 +12,22 @@ requestHandler::requestHandler(std::string const request) : _req() {
             isFirstLine = false;
             continue;
         }
-        std::string::size_type colonPos = line.find(":");
-        std::string key = line.substr(0, colonPos);
-        std::string val = line.substr(colonPos + 1);
-        _req[key] = val;
+        if (!isInBody) {
+            std::string::size_type colonPos = line.find(":");
+            std::string key = line.substr(0, colonPos);
+            std::string val = line.substr(colonPos + 1);
+            _req[key] = val;
+        }
         if (line.find("\r\n") && line.size() == 1 && isInBody == false) {
-            std::cout << line << std::endl;
             isInBody = true;
             std::getline(iss, line);
         }
         if (isInBody) {
-            body += line;
+            body += cleanLine(line);
         }
         std::cout << line << std::endl;
     }
     _req["body"] = body;
-    std::cout << "dabody:::" << _req["body"] << std::endl;
 }
 
 

@@ -12,5 +12,6 @@ std::string::size_type findSecondOccurrence(const std::string& str, char target)
 int isCGI(std::string const path);
 std::string intToString(int value);
 std::string getStatusCode(int err);
+std::string cleanLine(std::string &line);
 
 #endif

@@ -110,9 +110,11 @@ std::string CGIHandler::initCGI() {
     std::string method = _req["method"];
     std::string response;
 
-    if (!execCGI()) {
-        return "";
-    }
+    // if (!execCGI()) {
+    //     return "";
+    // }
+
+    parseBody();
 
     // std::cout << _body << std::endl;
 
@@ -120,6 +122,40 @@ std::string CGIHandler::initCGI() {
 
     return response;
 
+}
+
+std::string extractBoundary(std::string &line) {
+    std::string const boundaryStr = "boundary=";
+    std::string::size_type boundPos = line.find(boundaryStr);
+    if (boundPos == std::string::npos) {
+        std::cout << "??" << std::endl;
+        return "";
+    }
+    boundPos += boundaryStr.length();
+    std::string ret = line.substr(boundPos, line.length());
+    return ret;
+}
+
+void CGIHandler::parseBody() {
+    std::string boundary = extractBoundary(_req["Content-Type"]);
+    std::istringstream iss(_req["body"]);
+    std::string word;
+    getline(iss, word);
+    std::cout << "boundary:" << boundary << std::endl;
+    std::cout << "boundary:" << boundary.length() << std::endl;
+    std::cout << "word:    " << word << std::endl;
+    std::cout << "word:" << word.length() << std::endl;
+    int zaza = boundary.compare(word);
+    if (zaza != 1) {
+        std::cout << zaza << std::endl;
+        return ;
+    }
+    while (iss >> word) {
+        if (word == "\n")
+            std::cout << "emder" << std::endl;
+    }
+    std::cout << "final word: " << word << std::endl;
+    
 }
 
 // IL FO EUU CONSTRUCT LA REPONSE ET ENSUITE BIEN FAIRE UNE MAIN FONCTION QUI GERE TOUT

@@ -1,5 +1,15 @@
 #include "utils.hpp"
 
+std::string cleanLine(std::string &line) {
+    std::string::size_type pos = line.find("\r");
+    if (pos == std::string::npos) {
+        return line += '\n';
+    }
+    std::string str = line.substr(0, pos);
+    str += '\n';
+    return str;
+}
+
 std::string extractPathString(const std::string &inputString) {
     size_t queryEnd = inputString.find('?');
     return inputString.substr(0, queryEnd);
