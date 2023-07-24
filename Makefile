@@ -5,7 +5,8 @@ SRC =	src/main.cpp\
 		src/requestHandler.cpp\
 		src/serverSocket.cpp\
 		src/CGIHandler.cpp\
-		src/utils.cpp
+		src/utils.cpp\
+		src/Config_Parser.cpp
 
 CXX = c++
 

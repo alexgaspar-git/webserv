@@ -1,5 +1,6 @@
 #include "../includes/serverSocket.hpp"
 #include "../includes/requestHandler.hpp"
+#include "../includes/Config_Parser.hpp"
 
 int main(int argc, char **argv) {
 	(void)argv;
@@ -11,6 +12,14 @@ int main(int argc, char **argv) {
 		std::cerr << "need only one configuration file to launch the webserv." << std::endl;
 		return (1);
 	}
+	std::ifstream input(argv[1]);
+	if (!input.is_open()) {
+		std::cout << ".conf file doesn't exist." << std::endl;
+		return (1);
+	}
+	std::string conf((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+	Config_Parser pars(conf);
+	print_conf(&pars);
 	int new_events;
 	serverSocket srv(8080);
 	srv.init_kqueue();
