@@ -53,23 +53,23 @@ class Config_Parser
 		size_t _len;
 		size_t _len2;
 		
-	public:
-		std::vector<s_conf> *_config;
-		Config_Parser(std::string serv);
-		Config_Parser(Config_Parser const &src);
-		~Config_Parser();
-
-		Config_Parser &operator=(Config_Parser const &rhs);
-
 		int create_conf(std::string serv, int check);
 		int create_conf_location(std::string serv, int check, s_location *tmp_location);
-		int check_conf(std::string conf);
 		int check_server(std::string serv);
 		int check_result(std::string serv, int check);
 		int handle_location(std::string serv);
 		int check_option(std::string option);
 		void fill_location(s_location *tmp_location);
 		void clear_conf();
+	public:
+		std::vector<s_conf> *_config;
+		Config_Parser();
+		Config_Parser(Config_Parser const &src);
+		~Config_Parser();
+
+		Config_Parser &operator=(Config_Parser const &rhs);
+
+		int check_conf(std::string conf);
 };
 
 void print_conf(Config_Parser *pars);

@@ -1,7 +1,9 @@
 
 #include "../includes/serverSocket.hpp"
 
-serverSocket::serverSocket(int port) {
+serverSocket::serverSocket(int port) {//donner en arg config_parser pour recuperer tout les ports
+//creer std::map<int, std::string>(fd, port)
+//creer boucle while qui listen bind plusieur socket au meme kqueue
 	this->srvSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->srvSocket == -1 ) {
 		std::cerr << "Failed to create socket. errno: " << errno << std::endl;

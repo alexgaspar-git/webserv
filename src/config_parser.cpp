@@ -1,11 +1,10 @@
 
 #include "Config_Parser.hpp"
 
-Config_Parser::Config_Parser(std::string serv) {
+Config_Parser::Config_Parser() {
 	this->_config = new std::vector<s_conf>;
 	this->_conf_file = new s_conf;
 	this->_default_conf = new s_default;
-	check_conf(serv);
 }
 
 Config_Parser::Config_Parser(Config_Parser const &rhs) {(void)rhs;}//a faire
@@ -91,9 +90,11 @@ int Config_Parser::check_result(std::string serv, int check) {
 	return (0);
 }
 
-int Config_Parser::create_conf(std::string serv, int check) {//check si ok de recup index dans header conf
-	if (check_result(serv, check))
+int Config_Parser::create_conf(std::string serv, int check) {
+	if (check_result(serv, check)) {
+		std::cerr << "error in server conf :" << std::endl;
 		return (1);
+	}
 	switch (check) {
 		case LISTEN:
 			if (this->_conf_file->port.empty())
@@ -123,7 +124,7 @@ int Config_Parser::create_conf(std::string serv, int check) {//check si ok de re
 			if (this->_default_conf->autoindex.empty())
 				this->_default_conf->autoindex = serv.substr(this->_len2, this->_len - this->_len2);
 			else {
-				std::cerr << "error : multiple autoindex option in serv header" << std::endl;//reecrire
+				std::cerr << "error : multiple autoindex option in serv conf" << std::endl;
 				return (1);
 			}
 			break;
@@ -131,7 +132,7 @@ int Config_Parser::create_conf(std::string serv, int check) {//check si ok de re
 			if (this->_default_conf->method.empty())
 				this->_default_conf->method = serv.substr(this->_len2, this->_len - this->_len2);
 			else {
-				std::cerr << "error : multiple method option in serv header" << std::endl;//reecrire
+				std::cerr << "error : multiple method option in serv conf" << std::endl;
 				return (1);
 			}
 			break;
@@ -147,7 +148,7 @@ int Config_Parser::create_conf(std::string serv, int check) {//check si ok de re
 			if (this->_default_conf->root.empty())
 				this->_default_conf->root = serv.substr(this->_len2, this->_len - this->_len2);
 			else {
-				std::cerr << "error : multiple root option in serv header" << std::endl;//reecrire
+				std::cerr << "error : multiple root option in serv conf" << std::endl;
 				return (1);
 			}
 			break;
@@ -155,7 +156,7 @@ int Config_Parser::create_conf(std::string serv, int check) {//check si ok de re
 			if (this->_default_conf->index.empty())
 				this->_default_conf->index = serv.substr(this->_len2, this->_len - this->_len2);
 			else {
-				std::cerr << "error : multiple index option in serv header" << std::endl;//reecrire
+				std::cerr << "error : multiple index option in serv conf" << std::endl;
 				return (1);
 			}
 			break;
@@ -175,14 +176,16 @@ int Config_Parser::create_conf(std::string serv, int check) {//check si ok de re
 }
 
 int Config_Parser::create_conf_location(std::string serv, int check, s_location *tmp_location) {
-	if (check_result(serv, check))
+	if (check_result(serv, check)) {
+		std::cerr << "error in location part :" << std::endl;
 		return (1);
+	}
 	switch (check) {
 		case AUTO_INDEX:
 			if (tmp_location->autoindex.empty())
 				tmp_location->autoindex = serv.substr(this->_len2, this->_len - this->_len2);
 			else {
-				std::cerr << "error : multiple autoindex option in serv header" << std::endl;//reecrire
+				std::cerr << "error : multiple autoindex option in location part" << std::endl;
 				return (1);
 			}
 			break;
@@ -190,7 +193,7 @@ int Config_Parser::create_conf_location(std::string serv, int check, s_location 
 			if (tmp_location->method.empty())
 				tmp_location->method = serv.substr(this->_len2, this->_len - this->_len2);
 			else {
-				std::cerr << "error : multiple method option in serv header" << std::endl;//reecrire
+				std::cerr << "error : multiple method option in location part" << std::endl;
 				return (1);
 			}
 			break;
@@ -206,7 +209,7 @@ int Config_Parser::create_conf_location(std::string serv, int check, s_location 
 			if (tmp_location->root.empty())
 				tmp_location->root = serv.substr(this->_len2, this->_len - this->_len2);
 			else {
-				std::cerr << "error : multiple root option in serv header" << std::endl;//reecrire
+				std::cerr << "error : multiple root option in location part" << std::endl;
 				return (1);
 			}
 			break;
@@ -214,7 +217,7 @@ int Config_Parser::create_conf_location(std::string serv, int check, s_location 
 			if (tmp_location->index.empty())
 				tmp_location->index = serv.substr(this->_len2, this->_len - this->_len2);
 			else {
-				std::cerr << "error : multiple index option in serv header" << std::endl;//reecrire
+				std::cerr << "error : multiple index option in location part" << std::endl;
 				return (1);
 			}
 			break;
@@ -222,7 +225,7 @@ int Config_Parser::create_conf_location(std::string serv, int check, s_location 
 			if (tmp_location->upload.empty())
 				tmp_location->upload = serv.substr(this->_len2, this->_len - this->_len2);
 			else {
-				std::cerr << "error : multiple upload option in serv header" << std::endl;//reecrire
+				std::cerr << "error : multiple upload option in location part" << std::endl;
 				return (1);
 			}
 			break;
@@ -252,39 +255,6 @@ void Config_Parser::fill_location(s_location *tmp_location) {//verif si tout est
 	}
 }
 
-int Config_Parser::handle_location(std::string serv) {
-	this->_len++;
-	s_location tmp_location;
-	size_t end = serv.find_first_of("}", this->_len);
-	if (end == std::string::npos) {
-		std::cerr << "bad end" << std::endl;
-		return (1);
-	}
-	serv.resize(end + 1);
-	while (this->_len < end) {
-		this->_len = serv.find_first_not_of(WHITESPACE, this->_len);
-		if (this->_len == end)
-			break;
-		this->_len2 = serv.find_first_of(WHITESPACE, this->_len);
-		int check = check_option(serv.substr(this->_len, this->_len2 - this->_len));
-		if (!check) {
-			std::cerr << "unknown option" << std::endl;
-			return (1);
-		}
-		else {
-			this->_len2++;
-			if (create_conf_location(serv, check, &tmp_location)) {
-				std::cerr << "error create_conf" << std::endl;
-				return (1);
-			}
-			this->_len++;
-		}
-	}
-	fill_location(&tmp_location);
-	this->_conf_file->location.insert(std::pair<std::string, s_location>(this->_default_conf->tmp_location, tmp_location));
-	return (0);
-}
-
 int Config_Parser::check_option(std::string option) {
     std::map<std::string, int> list;
     list.insert(std::pair<std::string, int>("listen", LISTEN));
@@ -304,17 +274,37 @@ int Config_Parser::check_option(std::string option) {
 		return (list[option]);
 }
 
-void Config_Parser::clear_conf() {
-	this->_conf_file->port.clear();
-	this->_conf_file->name.clear();
-	this->_conf_file->body_size.clear();
-	this->_conf_file->location.clear();
-	this->_default_conf->autoindex.clear();
-	this->_default_conf->root.clear();
-	this->_default_conf->index.clear();
-	this->_default_conf->method.clear();
-	this->_default_conf->tmp_location.clear();
-	this->_default_conf->error.clear();
+int Config_Parser::handle_location(std::string serv) {
+	this->_len++;
+	s_location tmp_loc;
+	size_t end = serv.find_first_of("}", this->_len);
+	if (end == std::string::npos) {
+		std::cerr << "bad end" << std::endl;
+		return (1);
+	}
+	serv.resize(end + 1);
+	while (this->_len < end) {
+		this->_len = serv.find_first_not_of(WHITESPACE, this->_len);
+		if (this->_len == end)
+			break;
+		this->_len2 = serv.find_first_of(WHITESPACE, this->_len);
+		int check = check_option(serv.substr(this->_len, this->_len2 - this->_len));
+		if (!check) {
+			std::cerr << "unknown option" << std::endl;
+			return (1);
+		}
+		else {
+			this->_len2++;
+			if (create_conf_location(serv, check, &tmp_loc)) {
+				std::cerr << "error create_conf" << std::endl;
+				return (1);
+			}
+			this->_len++;
+		}
+	}
+	fill_location(&tmp_loc);
+	this->_conf_file->location.insert(std::pair<std::string, s_location>(this->_default_conf->tmp_location, tmp_loc));
+	return (0);
 }
 
 int Config_Parser::check_server(std::string serv) {
@@ -373,6 +363,19 @@ int Config_Parser::check_conf(std::string conf) {
 		this->_config->push_back(*this->_conf_file);
 	}
 	return (0);
+}
+
+void Config_Parser::clear_conf() {
+	this->_conf_file->port.clear();
+	this->_conf_file->name.clear();
+	this->_conf_file->body_size.clear();
+	this->_conf_file->location.clear();
+	this->_default_conf->autoindex.clear();
+	this->_default_conf->root.clear();
+	this->_default_conf->index.clear();
+	this->_default_conf->method.clear();
+	this->_default_conf->tmp_location.clear();
+	this->_default_conf->error.clear();
 }
 
 void print_conf(Config_Parser *pars){

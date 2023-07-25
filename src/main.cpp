@@ -18,12 +18,13 @@ int main(int argc, char **argv) {
 		return (1);
 	}
 	std::string conf((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-	Config_Parser pars(conf);
+	Config_Parser pars;
+	if (pars.check_conf(conf))
+		return (1);
 	print_conf(&pars);
 	int new_events;
 	serverSocket srv(8080);
 	srv.init_kqueue();
-
 	while (1) {
 		int tmp_fd;
 		struct kevent events[4];
