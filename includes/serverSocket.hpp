@@ -15,29 +15,31 @@
 class serverSocket
 {
 	private:
-		int srvSocket;
+		int srvskt;
 		sockaddr_in srvAdress;
 		socklen_t	addrlen;
 		int kqueue_fd;
 		struct kevent event;
 
 	public:
+		std::map<int, std::string> *_srvSocket;
 
-		serverSocket(int port);
+		serverSocket();
 		serverSocket(serverSocket const &src);
 		~serverSocket();
 		
-		void init_kqueue();
+		int init_kqueue();
+		int CreateSocket(ConfigParser *pars);
 		void create_request();
 		void handle_request(int clientSocket);
+		void close_all();
 
-		int				getSrvSocket() const;
+		int				getsrvskt() const;
 		int				getKqueue_fd() const;
 		sockaddr_in		getSrvAdress() const;
 		socklen_t		getAddrlen() const;
 
 		serverSocket &operator=(serverSocket const &rhs);
-		int CreateSocket(ConfigParser *pars);
 };
 
 #endif

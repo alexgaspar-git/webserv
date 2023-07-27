@@ -1,34 +1,8 @@
 
 #include "../includes/serverSocket.hpp"
 
-serverSocket::serverSocket(int port) {//donner en arg ConfigParser pour recuperer tout les ports
-//creer std::map<int, std::string>(fd, port)
-//creer boucle while qui listen bind plusieur socket au meme kqueue
-	this->srvSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (this->srvSocket == -1 ) {
-		std::cerr << "Failed to create socket. errno: " << errno << std::endl;
-		exit(1);//doit t'on vraiment utiliser exit (la reponse est non)
-	}
-	if (fcntl(this->srvSocket, F_SETFL, O_NONBLOCK) == -1) {
-		std::cout << "fcntl failed. errno: " << errno << std::endl;
-		close(this->srvSocket);
-		exit(1);
-	}
-	this->srvAdress.sin_family = AF_INET;
-    this->srvAdress.sin_addr.s_addr = INADDR_ANY;
-    this->srvAdress.sin_port = htons(port);
-	this->addrlen = sizeof(this->srvAdress);
-	if (bind(this->srvSocket, (sockaddr *)&this->srvAdress, this->addrlen) == -1) {
-		std::cerr << "failed to bind server socket. errno: " << errno << std::endl;
-		close(this->srvSocket);
-		exit(1);
-	}
-	if (listen(this->srvSocket, 10) == -1) {
-		std::cerr << "failed to listen on server socket. errno: " << errno << std::endl;
-		close(this->srvSocket);
-		exit(1);
-	}
-	std::cout << "Server is now listening on port " << port << std::endl;
+serverSocket::serverSocket() {
+	this->_srvSocket = new std::map<int, std::string>;
 }
 
 serverSocket::serverSocket(serverSocket const &rhs) {
@@ -36,34 +10,121 @@ serverSocket::serverSocket(serverSocket const &rhs) {
 }//brouillon
 
 serverSocket::~serverSocket() {
-	close(this->srvSocket);
+	close_all();
+	delete this->_srvSocket;
+	std::cout << " yo" << std::endl;
+}
+
+// int serverSocket::CreateSocket(ConfigParser *pars) {
+// //creer std::map<int, std::string>(fd, port)
+// //creer boucle while qui listen bind plusieur socket au meme kqueue
+// 	this->srvskt = socket(AF_INET, SOCK_STREAM, 0);
+// 	if (this->srvskt == -1 ) {
+// 		std::cerr << "Failed to create socket. errno: " << errno << std::endl;
+// 		return (1);
+// 	}
+// 	if (fcntl(this->srvskt, F_SETFL, O_NONBLOCK) == -1) {
+// 		std::cout << "fcntl failed. errno: " << errno << std::endl;
+// 		close(this->srvskt);
+// 		return (1);
+// 	}
+// 	this->srvAdress.sin_family = AF_INET;
+//     this->srvAdress.sin_addr.s_addr = INADDR_ANY;
+//     this->srvAdress.sin_port = htons(port);
+// 	this->addrlen = sizeof(this->srvAdress);
+// 	if (bind(this->srvskt, (sockaddr *)&this->srvAdress, this->addrlen) == -1) {
+// 		std::cerr << "failed to bind server socket. errno: " << errno << std::endl;
+// 		close(this->srvskt);
+// 		return (1);
+// 	}
+// 	if (listen(this->srvskt, 10) == -1) {
+// 		std::cerr << "failed to listen on server socket. errno: " << errno << std::endl;
+// 		close(this->srvskt);
+// 		return (1);
+// 	}
+// 	std::cout << "Server is now listening on port " << port << std::endl;
+// 	return (0);
+// }
+
+int stoint(std::string port) {
+	int i = 0;
+	for ( std::string::iterator it=port.begin(); it!=port.end(); ++it) {
+		if (!isdigit(port[i++])) {
+			std::cout << "only digit are expted for ports" << std::endl;
+			return (0);
+		}
+	}
+    std::istringstream iss(port);
+    int number;
+    iss >> number;
+	if (number < 1024 || number > 49151)
+		return (0);
+    return (number);
+}
+
+void serverSocket::close_all() {
+	for (std::map<int, std::string>::iterator it = this->_srvSocket->begin(); it != this->_srvSocket->end(); it++) {
+		close(it->first);
+	}
+	close(this->kqueue_fd);
 }
 
 int serverSocket::CreateSocket(ConfigParser *pars) {
-
-}
-
-void serverSocket::init_kqueue() {
+//creer std::map<int, std::string>(fd, port)
+//creer boucle while qui listen bind plusieur socket au meme kqueue
+	int port;
 	if ((this->kqueue_fd = kqueue()) == -1) {
 		std::cerr << "failed to create kqueue. errno: " << errno << std::endl;
-		close(this->srvSocket);
-		exit(1);
+		return(1);
 	}
-	EV_SET(&this->event, this->srvSocket, EVFILT_READ, EV_ADD, 0, 0, NULL);
-	if (kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL) == -1) {
-		std::cerr << "failed to register event. errno: " << errno << std::endl;
-		close(this->srvSocket);
-		close(this->kqueue_fd);
-		exit(1);
+	for (std::vector<s_conf>::iterator it = pars->_config->begin(); it != pars->_config->end(); it++) {
+		if (!(port = stoint(it->port)))
+			return (1);
+		this->srvskt = socket(AF_INET, SOCK_STREAM, 0);
+		if (this->srvskt == -1 ) {
+			std::cerr << "Failed to create socket. errno: " << errno << std::endl;
+			return (1);
+		}
+		if (fcntl(this->srvskt, F_SETFL, O_NONBLOCK) == -1) {
+			std::cout << "fcntl failed. errno: " << errno << std::endl;
+			close(this->srvskt);
+			return (1);
+		}
+		this->srvAdress.sin_family = AF_INET;
+		this->srvAdress.sin_addr.s_addr = INADDR_ANY;
+		this->srvAdress.sin_port = htons(port);
+		this->addrlen = sizeof(this->srvAdress);
+		if (bind(this->srvskt, (sockaddr *)&this->srvAdress, this->addrlen) == -1) {
+			std::cerr << "failed to bind server socket. errno: " << errno << std::endl;
+			close(this->srvskt);
+			return (1);
+		}
+		if (listen(this->srvskt, 10) == -1) {
+			std::cerr << "failed to listen on server socket. errno: " << errno << std::endl;
+			close(this->srvskt);
+			return (1);
+		}
+		EV_SET(&this->event, this->srvskt, EVFILT_READ, EV_ADD, 0, 0, NULL);
+		if (kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL) == -1) {
+			std::cerr << "failed to register event. errno: " << errno << std::endl;
+			close(this->srvskt);
+			return(1);
+		}
+		this->_srvSocket->insert(std::pair<int, std::string>(this->srvskt, it->port));
 	}
+	std::cout << "Server is now listening on port " << port << std::endl;
+	return (0);
 }
+
+// int serverSocket::init_kqueue() {
+// }
 
 void serverSocket::create_request() {
 	int clientSocket;
 	sockaddr_in clientAdress;
 	socklen_t cli_addrlen = sizeof(clientAdress);
 
-	clientSocket = accept(this->srvSocket, reinterpret_cast<sockaddr *>(&clientAdress), &cli_addrlen);
+	clientSocket = accept(this->srvskt, reinterpret_cast<sockaddr *>(&clientAdress), &cli_addrlen);//change this->srvskt
 	if (clientSocket == -1) {
 		std::cerr << "failed to accept connection. errno: " << errno << std::endl;
 		return;
@@ -98,14 +159,14 @@ void serverSocket::handle_request(int clientSocket) {
 }
 
 serverSocket &serverSocket::operator=(serverSocket const &rhs) {//brouillon
-	this->srvSocket = rhs.srvSocket;
+	this->srvskt = rhs.srvskt;
 	this->srvAdress = rhs.srvAdress;
 	this->addrlen = rhs.addrlen;
 	return (*this);
 }
 
-int serverSocket::getSrvSocket() const {
-	return(this->srvSocket);
+int serverSocket::getsrvskt() const {
+	return(this->srvskt);
 }
 
 sockaddr_in serverSocket::getSrvAdress() const {
