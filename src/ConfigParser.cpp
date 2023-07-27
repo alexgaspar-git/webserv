@@ -1,26 +1,25 @@
+#include "ConfigParser.hpp"
 
-#include "config_parser.hpp"
-
-Config_Parser::Config_Parser() {
+ConfigParser::ConfigParser() {
 	this->_config = new std::vector<s_conf>;
 	this->_conf_file = new s_conf;
 	this->_default_conf = new s_default;
 }
 
-Config_Parser::Config_Parser(Config_Parser const &rhs) {(void)rhs;}//a faire
+ConfigParser::ConfigParser(ConfigParser const &rhs) {(void)rhs;}//a faire
 
-Config_Parser::~Config_Parser() {
+ConfigParser::~ConfigParser() {
 	delete this->_config;
 	delete this->_conf_file;
 	delete this->_default_conf;
 }
 
-Config_Parser &Config_Parser::operator=(Config_Parser const &rhs) {//a faire
+ConfigParser &ConfigParser::operator=(ConfigParser const &rhs) {//a faire
 	(void)rhs;
 	return (*this);
 }
 
-int Config_Parser::check_result(std::string serv, int check) {
+int ConfigParser::check_result(std::string serv, int check) {
 	if (check != LOCATION)
 		this->_len = serv.find_first_of(";", this->_len);
 	else
@@ -90,7 +89,7 @@ int Config_Parser::check_result(std::string serv, int check) {
 	return (0);
 }
 
-int Config_Parser::create_conf(std::string serv, int check) {
+int ConfigParser::create_conf(std::string serv, int check) {
 	if (check_result(serv, check)) {
 		std::cerr << "error in server conf :" << std::endl;
 		return (1);
@@ -175,7 +174,7 @@ int Config_Parser::create_conf(std::string serv, int check) {
 	return (0);
 }
 
-int Config_Parser::create_conf_location(std::string serv, int check, s_location *tmp_location) {
+int ConfigParser::create_conf_location(std::string serv, int check, s_location *tmp_location) {
 	if (check_result(serv, check)) {
 		std::cerr << "error in location part :" << std::endl;
 		return (1);
@@ -238,7 +237,7 @@ int Config_Parser::create_conf_location(std::string serv, int check, s_location 
 	return (0);
 }
 
-void Config_Parser::fill_location(s_location *tmp_location) {//verif si tout est good (default option)
+void ConfigParser::fill_location(s_location *tmp_location) {//verif si tout est good (default option)
 	if (tmp_location->autoindex.empty()) {
 		if (this->_default_conf->autoindex.empty())
 			tmp_location->autoindex = "off";
@@ -255,7 +254,7 @@ void Config_Parser::fill_location(s_location *tmp_location) {//verif si tout est
 	}
 }
 
-int Config_Parser::check_option(std::string option) {
+int ConfigParser::check_option(std::string option) {
     std::map<std::string, int> list;
     list.insert(std::pair<std::string, int>("listen", LISTEN));
     list.insert(std::pair<std::string, int>("server_name", SERVER_NAME));
@@ -274,7 +273,7 @@ int Config_Parser::check_option(std::string option) {
 		return (list[option]);
 }
 
-int Config_Parser::handle_location(std::string serv) {
+int ConfigParser::handle_location(std::string serv) {
 	this->_len++;
 	s_location tmp_loc;
 	size_t end = serv.find_first_of("}", this->_len);
@@ -307,7 +306,7 @@ int Config_Parser::handle_location(std::string serv) {
 	return (0);
 }
 
-int Config_Parser::check_server(std::string serv) {
+int ConfigParser::check_server(std::string serv) {
 	this->_len = 0;
 	size_t end = serv.find_last_of("}");
 	if (end == std::string::npos || end != serv.find_last_not_of(WHITESPACE)) {
@@ -337,7 +336,7 @@ int Config_Parser::check_server(std::string serv) {
 	return (0);
 }
 
-int Config_Parser::check_conf(std::string conf) {
+int ConfigParser::check_conf(std::string conf) {
 	size_t len_max = conf.length();
 	size_t len = conf.find("server {");
 	size_t end = 0;
@@ -365,7 +364,7 @@ int Config_Parser::check_conf(std::string conf) {
 	return (0);
 }
 
-void Config_Parser::clear_conf() {
+void ConfigParser::clear_conf() {
 	this->_conf_file->port.clear();
 	this->_conf_file->name.clear();
 	this->_conf_file->body_size.clear();
@@ -378,7 +377,7 @@ void Config_Parser::clear_conf() {
 	this->_default_conf->error.clear();
 }
 
-void print_conf(Config_Parser *pars){
+void print_conf(ConfigParser *pars){
 	for (std::vector<s_conf>::iterator it = pars->_config->begin(); it != pars->_config->end(); it++) {
 		std::cout << std::endl << "--------------------------------------------------" << std::endl;
 		std::cout << "port :" << it->port << std::endl;

@@ -1,5 +1,6 @@
-#ifndef CONFIG_PARSER_HPP
- #define CONFIG_PARSER_HPP
+#ifndef CONFIGPARSER_HPP
+#define CONFIGPARSER_HPP
+
 
 # include <iostream>
 # include <string>   
@@ -44,7 +45,7 @@ typedef struct s_conf {
 	std::map<std::string, s_location> location;
 } t_conf;
 
-class Config_Parser
+class ConfigParser
 {
 	private:
 		s_conf *_conf_file;
@@ -62,15 +63,15 @@ class Config_Parser
 		void clear_conf();
 	public:
 		std::vector<s_conf> *_config;
-		Config_Parser();
-		Config_Parser(Config_Parser const &src);
-		~Config_Parser();
+		ConfigParser();
+		ConfigParser(ConfigParser const &src);
+		~ConfigParser();
 
-		Config_Parser &operator=(Config_Parser const &rhs);
+		ConfigParser &operator=(ConfigParser const &rhs);
 
 		int check_conf(std::string conf);
 };
 
-void print_conf(Config_Parser *pars);
+void print_conf(ConfigParser *pars);
 
 #endif
