@@ -1,5 +1,5 @@
 
-#include "Config_Parser.hpp"
+#include "config_parser.hpp"
 
 Config_Parser::Config_Parser() {
 	this->_config = new std::vector<s_conf>;

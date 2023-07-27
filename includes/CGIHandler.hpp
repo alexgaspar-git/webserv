@@ -13,6 +13,7 @@ class CGIHandler {
 private:
     std::map<std::string, std::string> _req;
     std::string _body;
+    std::string _fileName;
     const char *_path;
     const char **_argv;
     const char **_env;

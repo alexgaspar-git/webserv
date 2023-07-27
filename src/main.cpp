@@ -1,6 +1,6 @@
 #include "../includes/serverSocket.hpp"
 #include "../includes/requestHandler.hpp"
-#include "../includes/Config_Parser.hpp"
+#include "../includes/config_parser.hpp"
 
 int main(int argc, char **argv) {
 	(void)argv;
