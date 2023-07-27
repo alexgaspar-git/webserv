@@ -1,7 +1,7 @@
 
 #include "../includes/serverSocket.hpp"
 
-serverSocket::serverSocket(int port) {//donner en arg config_parser pour recuperer tout les ports
+serverSocket::serverSocket(int port) {//donner en arg ConfigParser pour recuperer tout les ports
 //creer std::map<int, std::string>(fd, port)
 //creer boucle while qui listen bind plusieur socket au meme kqueue
 	this->srvSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -37,6 +37,10 @@ serverSocket::serverSocket(serverSocket const &rhs) {
 
 serverSocket::~serverSocket() {
 	close(this->srvSocket);
+}
+
+int serverSocket::CreateSocket(ConfigParser *pars) {
+
 }
 
 void serverSocket::init_kqueue() {

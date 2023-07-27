@@ -1,6 +1,6 @@
 #include "../includes/serverSocket.hpp"
 #include "../includes/requestHandler.hpp"
-#include "../includes/Config_Parser.hpp"
+#include "../includes/ConfigParser.hpp"
 
 int main(int argc, char **argv) {
 	(void)argv;
@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 		return (1);
 	}
 	std::string conf((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-	Config_Parser pars;
+	ConfigParser pars;
 	if (pars.check_conf(conf))
 		return (1);
 	print_conf(&pars);

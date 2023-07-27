@@ -10,7 +10,7 @@
 # include <fcntl.h>
 # include <unistd.h>
 # include "requestHandler.hpp"
-
+# include "ConfigParser.hpp"
 
 class serverSocket
 {
@@ -37,6 +37,7 @@ class serverSocket
 		socklen_t		getAddrlen() const;
 
 		serverSocket &operator=(serverSocket const &rhs);
+		int CreateSocket(ConfigParser *pars);
 };
 
 #endif
