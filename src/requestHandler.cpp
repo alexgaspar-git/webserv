@@ -16,7 +16,7 @@ requestHandler::requestHandler(std::string const request) : _req() {
             std::string::size_type colonPos = line.find(":");
             std::string key = line.substr(0, colonPos);
             std::string val = line.substr(colonPos + 1);
-            _req[key] = val;
+            _req[key] = cleanLine(val);
         }
         if (line.find("\r\n") && line.size() == 1 && isInBody == false) {
             isInBody = true;
@@ -24,6 +24,7 @@ requestHandler::requestHandler(std::string const request) : _req() {
         }
         if (isInBody) {
             body += cleanLine(line);
+            body += "\n";
         }
         std::cout << line << std::endl;
     }

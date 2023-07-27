@@ -14,4 +14,5 @@ std::string intToString(int value);
 std::string getStatusCode(int err);
 std::string cleanLine(std::string &line);
 
+
 #endif

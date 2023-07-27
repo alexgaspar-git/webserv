@@ -6,7 +6,6 @@ std::string cleanLine(std::string &line) {
         return line += '\n';
     }
     std::string str = line.substr(0, pos);
-    str += '\n';
     return str;
 }
 
