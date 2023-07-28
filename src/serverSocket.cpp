@@ -12,45 +12,13 @@ serverSocket::serverSocket(serverSocket const &rhs) {
 serverSocket::~serverSocket() {
 	close_all();
 	delete this->_srvSocket;
-	std::cout << " yo" << std::endl;
 }
-
-// int serverSocket::CreateSocket(ConfigParser *pars) {
-// //creer std::map<int, std::string>(fd, port)
-// //creer boucle while qui listen bind plusieur socket au meme kqueue
-// 	this->srvskt = socket(AF_INET, SOCK_STREAM, 0);
-// 	if (this->srvskt == -1 ) {
-// 		std::cerr << "Failed to create socket. errno: " << errno << std::endl;
-// 		return (1);
-// 	}
-// 	if (fcntl(this->srvskt, F_SETFL, O_NONBLOCK) == -1) {
-// 		std::cout << "fcntl failed. errno: " << errno << std::endl;
-// 		close(this->srvskt);
-// 		return (1);
-// 	}
-// 	this->srvAdress.sin_family = AF_INET;
-//     this->srvAdress.sin_addr.s_addr = INADDR_ANY;
-//     this->srvAdress.sin_port = htons(port);
-// 	this->addrlen = sizeof(this->srvAdress);
-// 	if (bind(this->srvskt, (sockaddr *)&this->srvAdress, this->addrlen) == -1) {
-// 		std::cerr << "failed to bind server socket. errno: " << errno << std::endl;
-// 		close(this->srvskt);
-// 		return (1);
-// 	}
-// 	if (listen(this->srvskt, 10) == -1) {
-// 		std::cerr << "failed to listen on server socket. errno: " << errno << std::endl;
-// 		close(this->srvskt);
-// 		return (1);
-// 	}
-// 	std::cout << "Server is now listening on port " << port << std::endl;
-// 	return (0);
-// }
 
 int stoint(std::string port) {
 	int i = 0;
 	for ( std::string::iterator it=port.begin(); it!=port.end(); ++it) {
 		if (!isdigit(port[i++])) {
-			std::cout << "only digit are expted for ports" << std::endl;
+			std::cerr<< "only digit are expted for ports" << std::endl;
 			return (0);
 		}
 	}
@@ -70,8 +38,6 @@ void serverSocket::close_all() {
 }
 
 int serverSocket::CreateSocket(ConfigParser *pars) {
-//creer std::map<int, std::string>(fd, port)
-//creer boucle while qui listen bind plusieur socket au meme kqueue
 	int port;
 	if ((this->kqueue_fd = kqueue()) == -1) {
 		std::cerr << "failed to create kqueue. errno: " << errno << std::endl;
@@ -86,7 +52,7 @@ int serverSocket::CreateSocket(ConfigParser *pars) {
 			return (1);
 		}
 		if (fcntl(this->srvskt, F_SETFL, O_NONBLOCK) == -1) {
-			std::cout << "fcntl failed. errno: " << errno << std::endl;
+			std::cerr << "fcntl failed. errno: " << errno << std::endl;
 			close(this->srvskt);
 			return (1);
 		}
@@ -112,25 +78,22 @@ int serverSocket::CreateSocket(ConfigParser *pars) {
 		}
 		this->_srvSocket->insert(std::pair<int, std::string>(this->srvskt, it->port));
 	}
-	std::cout << "Server is now listening on port " << port << std::endl;
+	std::cout << "Server up" << std::endl;
 	return (0);
 }
 
-// int serverSocket::init_kqueue() {
-// }
-
-void serverSocket::create_request() {
+void serverSocket::create_request(int fd) {
 	int clientSocket;
 	sockaddr_in clientAdress;
 	socklen_t cli_addrlen = sizeof(clientAdress);
 
-	clientSocket = accept(this->srvskt, reinterpret_cast<sockaddr *>(&clientAdress), &cli_addrlen);//change this->srvskt
+	clientSocket = accept(fd, reinterpret_cast<sockaddr *>(&clientAdress), &cli_addrlen);//change this->srvskt
 	if (clientSocket == -1) {
 		std::cerr << "failed to accept connection. errno: " << errno << std::endl;
 		return;
 	}
 	if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1) {
-		std::cout << "fcntl failed. errno: " << errno << std::endl;
+		std::cerr << "fcntl failed. errno: " << errno << std::endl;
 		close(clientSocket);
 		return;
 	}

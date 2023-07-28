@@ -29,7 +29,7 @@ class serverSocket
 		
 		int init_kqueue();
 		int CreateSocket(ConfigParser *pars);
-		void create_request();
+		void create_request(int fd);
 		void handle_request(int clientSocket);
 		void close_all();
 

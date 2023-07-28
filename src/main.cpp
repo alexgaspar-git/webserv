@@ -26,8 +26,6 @@ int main(int argc, char **argv) {
 	serverSocket srv;
 	if (srv.CreateSocket(&pars))
 		return (1);
-	// if (srv.init_kqueue())
-	// 	return (1);
 	while (1) {
 		int tmp_fd;
 		struct kevent events[4];
@@ -35,7 +33,7 @@ int main(int argc, char **argv) {
 		for (int i = 0; i < new_events; i++) {
 			tmp_fd = events[i].ident;
 			if (srv._srvSocket->find(tmp_fd) != srv._srvSocket->end())
-				srv.create_request();
+				srv.create_request(tmp_fd);
 			else
 				srv.handle_request(tmp_fd);
 		}
