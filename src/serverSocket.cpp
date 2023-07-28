@@ -123,7 +123,7 @@ void serverSocket::handle_request(int clientSocket) {
     }
     // char buffer[8192];//verifier si suffisant pour la methode post
     // ssize_t bytesRead = read(clientSocket, buffer, sizeof(buffer));
-	std::cout << bytesRead << std::endl;
+	// std::cout << bytesRead << std::endl;
     if (bytesRead > 0) {
         // std::string request(buffer, bytesRead);
 		// std::cout << std::endl;

@@ -15,10 +15,9 @@
             if ($file !== '.' && $file !== '..' && is_file($directory . $file)) {
                 $file_url = htmlspecialchars($directory . $file);
                 $file_name = htmlspecialchars($file);
-                echo "<li><a href=\"$file_url\">$file_name</a></li>";
+                echo "<li><img src=\"./uploads/$file_name\"></li>";
             }
         }
-
 
         if (empty($files)) {
             echo "<li>No files found in the directory.</li>";

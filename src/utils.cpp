@@ -24,6 +24,8 @@ std::string extractQueryString(const std::string &inputString) {
 
 int isCGI(std::string const path) {
     size_t pos = path.find_last_of('.');
+    if (pos == std::string::npos)
+        return NOCGI;
     std::string test = path.substr(pos);
     if (test.compare(".py") == 0)
         return PYTHON;

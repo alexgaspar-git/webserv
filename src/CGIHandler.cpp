@@ -7,7 +7,6 @@ CGIHandler::CGIHandler(std::map<std::string, std::string> const &request, bool t
     } else {
         _path = strdup("/usr/bin/php");
     }
-
     _argv = getArgv();
     _env = getEnv();
 };
@@ -65,6 +64,7 @@ const char **CGIHandler::getEnv() {
     
     for (size_t i = 0; i < tmp.size(); i++) {
         env[i] = strdup(tmp[i].c_str());
+        std::cout << env[i] << std::endl;
     }
     
     env[tmp.size()] = NULL;
@@ -95,11 +95,9 @@ bool CGIHandler::execCGI() {
     } else {
         close(outPipe[1]);
         close(inPipe[0]);
-        // A VOIR DANS LE FUTUR SI IL FAUT PAS BOUCLER AFIN DE RECUPERER LES DONNEES PAS ENCORE TRANSMISES
         if (write(inPipe[1], _req["body"].c_str(), _req["body"].size()) == -1) {
             return false;
         }
-        //
         close(inPipe[1]);
         char buffer[512];
         size_t bytesRead;
@@ -121,20 +119,12 @@ std::string CGIHandler::constructResponse() {
 }
 
 std::string CGIHandler::initCGI() {
-    // ne gere que GET pour l'instant
-    std::string method = _req["method"];
-    std::string response;
-    
-    // parseBody();
 
     if (!execCGI()) {
         return "";
     }
 
-
-    // std::cout << _body << std::endl;
-
-    response = constructResponse();
+    std::string response = constructResponse();
 
     std::cout << response << std::endl;
 
@@ -152,36 +142,3 @@ std::string extractBoundary(std::string &line) {
     std::string ret = line.substr(boundPos + 1);
     return ret;
 }
-
-// void CGIHandler::parseBody() {
-//     std::string boundary = extractBoundary(_req["Content-Type"]);
-//     std::string endBound = boundary + "--";
-//     std::istringstream iss(_req["body"]);
-//     std::string params;
-//     std::string word;
-//     while (getline(iss, word)) {
-//         if (word.find(boundary) != std::string::npos && word.find(endBound) == std::string::npos) {
-//             while (getline(iss, word)) {
-//                 params += word;
-//                 params += "\n";
-//                 if (word.size() == 0) {
-//                     std::string filenameStr = "filename=\"";
-//                     std::string::size_type fileNamePos = params.find(filenameStr);
-//                     fileNamePos += filenameStr.size();
-//                     std::string::size_type endPos = params.find('\"', fileNamePos);
-//                     _fileName = params.substr(fileNamePos, endPos - fileNamePos);
-//                     std::cout << "filename: " << _fileName << std::endl;
-//                     break;
-//                 }
-//             }
-//         }
-
-//     }
-// }
-
-
-
-// IL FO EUU CONSTRUCT LA REPONSE ET ENSUITE BIEN FAIRE UNE MAIN FONCTION QUI GERE TOUT
-// merci alex du passé
-
-//nouvelle idée pour erreurs, passer en string un identifiant d'érreur en mode "#!404" et avant d'envoyer la reponse, parser si c'est une erreur ou si c'est une reponse typique

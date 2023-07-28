@@ -28,9 +28,9 @@ requestHandler::requestHandler(std::string const request) : _req() {
         }
     }
     _req["body"] = body;
-    std::cout << "++++++++++++BODY+++++++++++++++++++" << std::endl;
-    std::cout << _req["body"] << std::endl;
-    std::cout << "+++++++++++++++++++++++++++++++++++" << std::endl;
+    // std::cout << "++++++++++++BODY+++++++++++++++++++" << std::endl;
+    // std::cout << _req["body"] << std::endl;
+    // std::cout << "+++++++++++++++++++++++++++++++++++" << std::endl;
 }
 
 
@@ -59,15 +59,10 @@ std::string requestHandler::handleRequest() {
     std::string path = _req["path"];
     int check = isCGI(path);
     if (check != NOCGI) {
-        if (check == PYTHON) {
-            CGIHandler cgi(_req, PYTHON);
-            std::string response = cgi.initCGI();
-            return response;
-        } else {
-            CGIHandler cgi(_req, PHP);
-            std::string response = cgi.initCGI();
-            return response;
-        }
+        std::cout << "am i rentring la dedans" << std::endl;
+        CGIHandler cgi(_req, check);
+        std::string response = cgi.initCGI();
+        return response;
     } else {
         if (_req["method"].compare("GET") != 0)
             return makeErrorResponse(403);
@@ -78,10 +73,10 @@ std::string requestHandler::handleRequest() {
 std::string constructGetResponse(int status, std::ifstream &input) {
     std::string result =  HTTPVER + getStatusCode(status) + "\r\n";
     std::string content((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-    std::cout << "CONTENT ========" << std::endl;
-    std::cout << content << std::endl;
+    // std::cout << "CONTENT ========" << std::endl;
+    // std::cout << content << std::endl;
     size_t contentLen = content.size();
-    std::cout << "============== content len: " << contentLen << std::endl;
+    // std::cout << "============== content len: " << contentLen << std::endl;
     result += "Content-Length: " + std::to_string(contentLen) + "\r\n\r\n";
     result += content;
     return result;
