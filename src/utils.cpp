@@ -41,7 +41,11 @@ std::string::size_type findSecondOccurrence(const std::string& str, char target)
 
 int isCGI(std::string const path) {
     std::string test = path.substr(0, findSecondOccurrence(path, '/'));
-    return test.compare("/cgi-bin");
+    if (test.compare("/cgi-bin") == 0)
+        return PYTHON;
+    if (test.compare("/php") == 0)
+        return PHP;
+    return NOCGI;
 }
 
 std::string intToString(int value) {

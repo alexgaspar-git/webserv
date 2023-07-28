@@ -20,7 +20,7 @@ private:
     const char **getArgv();
     const char **getEnv();
 public:
-    CGIHandler(std::map<std::string, std::string> const &request);
+    CGIHandler(std::map<std::string, std::string> const &request, bool type);
     ~CGIHandler();
     std::string initCGI();
     bool execCGI();
