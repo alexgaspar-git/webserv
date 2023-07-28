@@ -114,10 +114,10 @@ void serverSocket::handle_request(int clientSocket) {
         nb = recv(clientSocket, buf, sizeof(buf) - 1, MSG_DONTWAIT);
 		// std::cout << nb << std::endl;
 		if (nb == -1)
-			buf[0] = '\0';
+			break;
 		else
         	bytesRead += nb;
-        request += buf;
+        request += std::string(buf, nb);
 		// std::cout << "*******" <<request << std::endl;
 		// std::cout << "*******" << std::endl;
     }
