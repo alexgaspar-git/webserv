@@ -22,28 +22,12 @@ std::string extractQueryString(const std::string &inputString) {
     return "";
 }
 
-std::string::size_type findSecondOccurrence(const std::string& str, char target) {
-    std::string::size_type firstIndex = std::string::npos;
-    std::string::size_type secondIndex = std::string::npos;
-
-    for (std::string::size_type i = 0; i < str.length(); i++) {
-        if (str[i] == target) {
-            if (firstIndex == std::string::npos)
-                firstIndex = i;
-            else {
-                secondIndex = i;
-                break;
-            }
-        }
-    }
-    return secondIndex;
-}
-
 int isCGI(std::string const path) {
-    std::string test = path.substr(0, findSecondOccurrence(path, '/'));
-    if (test.compare("/cgi-bin") == 0)
+    size_t pos = path.find_last_of('.');
+    std::string test = path.substr(pos);
+    if (test.compare(".py") == 0)
         return PYTHON;
-    if (test.compare("/php") == 0)
+    if (test.compare(".php") == 0)
         return PHP;
     return NOCGI;
 }

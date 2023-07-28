@@ -7,7 +7,7 @@
     <h1>List of Files in /uploads/ Directory</h1>
     <ul>
         <?php
-        $directory = './www/pages/';
+        $directory = './www/uploads/';
         $files = scandir($directory);
 
         foreach ($files as $file) {

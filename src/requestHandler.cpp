@@ -23,11 +23,14 @@ requestHandler::requestHandler(std::string const request) : _req() {
             std::getline(iss, line);
         }
         if (isInBody) {
-            body += cleanLine(line);
+            body += line;
             body += "\n";
         }
     }
     _req["body"] = body;
+    std::cout << "++++++++++++BODY+++++++++++++++++++" << std::endl;
+    std::cout << _req["body"] << std::endl;
+    std::cout << "+++++++++++++++++++++++++++++++++++" << std::endl;
 }
 
 

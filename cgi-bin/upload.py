@@ -4,10 +4,17 @@ path = os.environ['UPLOAD_DIR']
 form = cgi.FieldStorage()
 fi = form['filename']
 
+# for field in form.keys():
+#     if form[field].file:
+#         print(f"{field} (filename): {form[field].filename}")
+#         # Access the file data using form[field].file.read()
+#     else:
+#         print(f"{field}: {form[field].value}")
+
 if fi.filename:
 	if not os.path.exists(path):
 		os.makedirs(path)
-	fn = os.path.basename(fi.filename)
+	fn = os.path.basename(fi.filename)  
 	open(path + fn, 'wb').write(fi.file.read())
 	print("""\
     <!DOCTYPE html>

@@ -28,6 +28,7 @@ const char** CGIHandler::getArgv() {
         path = "." + extractPathString(_req["path"]);
     } else {
         tmp[0] = strdup(php.c_str());
+        std::cout << "path: " << _req["path"] << std::endl;
         path = "./www" + extractPathString(_req["path"]);
     }
     tmp[1] = strdup(path.c_str());
@@ -95,7 +96,7 @@ bool CGIHandler::execCGI() {
         close(outPipe[1]);
         close(inPipe[0]);
         // A VOIR DANS LE FUTUR SI IL FAUT PAS BOUCLER AFIN DE RECUPERER LES DONNEES PAS ENCORE TRANSMISES
-        if (write(inPipe[1], _req["body"].c_str(), _req["body"].size() + 1) == -1) {
+        if (write(inPipe[1], _req["body"].c_str(), _req["body"].size()) == -1) {
             return false;
         }
         //
@@ -152,31 +153,31 @@ std::string extractBoundary(std::string &line) {
     return ret;
 }
 
-void CGIHandler::parseBody() {
-    std::string boundary = extractBoundary(_req["Content-Type"]);
-    std::string endBound = boundary + "--";
-    std::istringstream iss(_req["body"]);
-    std::string params;
-    std::string word;
-    while (getline(iss, word)) {
-        if (word.find(boundary) != std::string::npos && word.find(endBound) == std::string::npos) {
-            while (getline(iss, word)) {
-                params += word;
-                params += "\n";
-                if (word.size() == 0) {
-                    std::string filenameStr = "filename=\"";
-                    std::string::size_type fileNamePos = params.find(filenameStr);
-                    fileNamePos += filenameStr.size();
-                    std::string::size_type endPos = params.find('\"', fileNamePos);
-                    _fileName = params.substr(fileNamePos, endPos - fileNamePos);
-                    std::cout << "filename: " << _fileName << std::endl;
-                    break;
-                }
-            }
-        }
+// void CGIHandler::parseBody() {
+//     std::string boundary = extractBoundary(_req["Content-Type"]);
+//     std::string endBound = boundary + "--";
+//     std::istringstream iss(_req["body"]);
+//     std::string params;
+//     std::string word;
+//     while (getline(iss, word)) {
+//         if (word.find(boundary) != std::string::npos && word.find(endBound) == std::string::npos) {
+//             while (getline(iss, word)) {
+//                 params += word;
+//                 params += "\n";
+//                 if (word.size() == 0) {
+//                     std::string filenameStr = "filename=\"";
+//                     std::string::size_type fileNamePos = params.find(filenameStr);
+//                     fileNamePos += filenameStr.size();
+//                     std::string::size_type endPos = params.find('\"', fileNamePos);
+//                     _fileName = params.substr(fileNamePos, endPos - fileNamePos);
+//                     std::cout << "filename: " << _fileName << std::endl;
+//                     break;
+//                 }
+//             }
+//         }
 
-    }
-}
+//     }
+// }
 
 
 
