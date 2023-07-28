@@ -11,6 +11,9 @@
 #define HTTPVER "HTTP/1.1 "
 #define SITEPATH "www"
 #define ERRORPATH "www/error/"
+#define PYTHON 1
+#define PHP 0
+#define NOCGI 2
 
 #include "CGIHandler.hpp"
 #include "utils.hpp"

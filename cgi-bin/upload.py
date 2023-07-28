@@ -1,47 +1,26 @@
-#!/usr/bin/env python3
+import cgi, os
 
-import cgi
-import os
-
-UPLOAD_DIR = '/Users/algaspar/Desktop/'  # Change this to your desired upload directory
-
-def save_uploaded_file(fileitem, upload_dir):
-    if not os.path.exists(upload_dir):
-        os.makedirs(upload_dir)
-
-    filename = os.path.join(upload_dir, os.path.basename(fileitem.filename))
-    with open(filename, 'wb') as f:
-        while True:
-            chunk = fileitem.file.read(8192)
-            if not chunk:
-                break
-            f.write(chunk)
-    return filename
-
-print("Content-type: text/html")
-print()
-
-print("<html><body>")
-print("<h2>File Upload</h2>")
-
+path = os.environ['UPLOAD_DIR']
 form = cgi.FieldStorage()
+fi = form['filename']
 
-if 'file' in form:
-    fileitem = form['file']
-    if fileitem.filename:
-        try:
-            uploaded_file = save_uploaded_file(fileitem, UPLOAD_DIR)
-            print(f"<p>File '{fileitem.filename}' uploaded successfully to '{uploaded_file}'</p>")
-        except Exception as e:
-            print(f"<p>Error uploading file: {e}</p>")
-    else:
-        print("<p>No file selected.</p>")
-else:
-    print("""
-        <form enctype="multipart/form-data" method="post">
-        <input type="file" name="file" />
-        <input type="submit" value="Upload" />
-        </form>
-    """)
-
-print("</body></html>")
+if fi.filename:
+	if not os.path.exists(path):
+		os.makedirs(path)
+	fn = os.path.basename(fi.filename)
+	open(path + fn, 'wb').write(fi.file.read())
+	print("""\
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Upload success</title>
+    </head>
+    <body>
+        <h1>Your file has been successfully uploaded to {}</h1>
+        <a href="../">go back</a>
+    </body>
+    </html>
+	""".format(path))

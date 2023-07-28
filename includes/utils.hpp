@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include "requestHandler.hpp"
 
 std::string extractPathString(const std::string &inputString);
 std::string extractQueryString(const std::string &inputString);

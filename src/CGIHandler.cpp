@@ -1,7 +1,13 @@
 #include "CGIHandler.hpp"
 #include "utils.hpp"
 
-CGIHandler::CGIHandler(std::map<std::string, std::string> const &request) : _req(request), _body(), _path("/usr/bin/python3") {
+CGIHandler::CGIHandler(std::map<std::string, std::string> const &request, bool type) : _req(request), _body(), _path() {
+    if (type == PYTHON) {
+        _path = strdup("/usr/bin/python3");
+    } else {
+        _path = strdup("/usr/bin/php");
+    }
+
     _argv = getArgv();
     _env = getEnv();
 };
@@ -13,10 +19,17 @@ CGIHandler::~CGIHandler() {
 
 const char** CGIHandler::getArgv() {
     std::string py = "python3";
-    std::string path = "." + extractPathString(_req["path"]);
+    std::string php = "php";
+    std::string path;
 
     const char** tmp = new const char*[3];
-    tmp[0] = strdup(py.c_str());
+    if (strcmp(_path, "/usr/bin/python3") == 0) {
+        tmp[0] = strdup(py.c_str());
+        path = "." + extractPathString(_req["path"]);
+    } else {
+        tmp[0] = strdup(php.c_str());
+        path = "./www" + extractPathString(_req["path"]);
+    }
     tmp[1] = strdup(path.c_str());
     tmp[2] = NULL;
 
@@ -40,7 +53,7 @@ const char **CGIHandler::getEnv() {
     tmp.push_back("HTTP_ACCEPT_LANGUAGE=" + _req["Accept"]);
     tmp.push_back("CONTENT_LENGTH=" + intToString(_req["body"].size()));
     tmp.push_back("CONTENT_TYPE=" + _req["Content-Type"]);
-    tmp.push_back("UPLOAD_DIR=/Users/algaspar/Desktop/");
+    tmp.push_back("UPLOAD_DIR=./www/uploads/");
     
     /*
     tmp.push_back("HTTP_COOKIE="); a voir ce que ca fait
@@ -121,6 +134,8 @@ std::string CGIHandler::initCGI() {
     // std::cout << _body << std::endl;
 
     response = constructResponse();
+
+    std::cout << response << std::endl;
 
     return response;
 
