@@ -109,12 +109,16 @@ void serverSocket::handle_request(int clientSocket) {
 	std::string request;
     ssize_t bytesRead = 0;
     char buf[1024];
-    for (size_t nb =1;nb != 0 && nb != -1;) {
+    for (ssize_t nb = 1;nb != 0 && nb != -1;) {
         memset(buf, 0, sizeof(buf));
-        nb = read(clientSocket, buf, sizeof(buf));
-        std::cout << nb << std::endl;
+        nb = read(clientSocket, buf, sizeof(buf) - 1);
+		std::cout << nb << std::endl;
+		if (nb == -1)
+			break;
         bytesRead += nb;
         request += buf;
+		// std::cout << "*******" <<request << std::endl;
+		// std::cout << "*******" << std::endl;
     }
     // char buffer[8192];//verifier si suffisant pour la methode post
     // ssize_t bytesRead = read(clientSocket, buffer, sizeof(buffer));
