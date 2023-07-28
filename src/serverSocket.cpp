@@ -106,16 +106,24 @@ void serverSocket::create_request(int fd) {
 }
 
 void serverSocket::handle_request(int clientSocket) {
-    char buffer[256*1024];//verifier si suffisant pour la methode post
-    ssize_t bytesRead = read(clientSocket, buffer, sizeof(buffer));
-	std::cout << "bytesRead = " << bytesRead << std::endl;
+	std::string request;
+    ssize_t bytesRead = 0;
+    char buf[1024];
+    for (size_t nb =1;nb != 0 && nb != -1;) {
+        memset(buf, 0, sizeof(buf));
+        nb = read(clientSocket, buf, sizeof(buf));
+        std::cout << nb << std::endl;
+        bytesRead += nb;
+        request += buf;
+    }
+    // char buffer[8192];//verifier si suffisant pour la methode post
+    // ssize_t bytesRead = read(clientSocket, buffer, sizeof(buffer));
     if (bytesRead > 0) {
-        std::string request(buffer, bytesRead);
+        // std::string request(buffer, bytesRead);
 		// std::cout << std::endl;
-		// std::cout << "===================REQ===================" << std::endl;
+		// std::cout << "-------- REQUEST RECEIVED --------" << std::endl;
 		// std::cout << request;
-		// std::cout << "=========================================" << std::endl;
-		// std::cout << std::endl;
+		// std::cout << "----------------------------------" << std::endl;
         requestHandler test(request);
         std::string response = test.handleRequest();
         write(clientSocket, response.c_str(), response.length());
