@@ -6,6 +6,7 @@
 # include <string>   
 # include <fstream>   
 # include <map>
+# include <sstream>
 # include <vector>
 
 # define WHITESPACE " \t\n\v\f\r"
@@ -41,7 +42,7 @@ typedef struct s_location {
 typedef struct s_conf {
 	std::string port;
 	std::string name;
-	std::string body_size;
+	size_t body_size;
 	std::map<std::string, s_location> location;
 } t_conf;
 

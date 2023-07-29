@@ -89,6 +89,25 @@ int ConfigParser::check_result(std::string serv, int check) {
 	return (0);
 }
 
+size_t check_body_size(std::string port) {
+	size_t i = 0;
+	for ( std::string::iterator it=port.begin(); it!=port.end(); ++it) {
+		if (!isdigit(port[i++])) {
+			std::cerr<< "only digit are expted for body_size" << std::endl;
+			return (0);
+		}
+	}
+	std::istringstream iss(port);
+	size_t number = 0;
+	iss >> number;
+	if (number == 0 || number > 5000000) {
+		std::cerr<< "values accepted for body_size are between 1 and 5000000" << std::endl;
+		return (0);
+	}
+	return (number);
+}
+
+
 int ConfigParser::create_conf(std::string serv, int check) {
 	if (check_result(serv, check)) {
 		std::cerr << "error in server conf :" << std::endl;
@@ -112,8 +131,10 @@ int ConfigParser::create_conf(std::string serv, int check) {
 			}
 			break;
 		case BODY_SIZE:
-			if (this->_conf_file->body_size.empty())
-				this->_conf_file->body_size = serv.substr(this->_len2, this->_len - this->_len2);
+			if (this->_conf_file->body_size == 0) {
+				if (!(this->_conf_file->body_size = check_body_size(serv.substr(this->_len2, this->_len - this->_len2))))
+					return (1);
+			}
 			else {
 				std::cerr << "only one body_size per serv" << std::endl;
 				return (1);
@@ -359,6 +380,8 @@ int ConfigParser::check_conf(std::string conf) {
 			return (1);
 		}
 		len = end;
+		if (this->_conf_file->body_size == 0)
+			this->_conf_file->body_size = 1000000;
 		this->_config->push_back(*this->_conf_file);
 	}
 	return (0);
@@ -367,7 +390,7 @@ int ConfigParser::check_conf(std::string conf) {
 void ConfigParser::clear_conf() {
 	this->_conf_file->port.clear();
 	this->_conf_file->name.clear();
-	this->_conf_file->body_size.clear();
+	this->_conf_file->body_size = 0;
 	this->_conf_file->location.clear();
 	this->_default_conf->autoindex.clear();
 	this->_default_conf->root.clear();

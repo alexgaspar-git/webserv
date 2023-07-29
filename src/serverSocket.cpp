@@ -14,7 +14,7 @@ serverSocket::~serverSocket() {
 	delete this->_srvSocket;
 }
 
-int stoint(std::string port) {
+int translate_port(std::string port) {
 	int i = 0;
 	for ( std::string::iterator it=port.begin(); it!=port.end(); ++it) {
 		if (!isdigit(port[i++])) {
@@ -22,12 +22,12 @@ int stoint(std::string port) {
 			return (0);
 		}
 	}
-    std::istringstream iss(port);
-    int number;
-    iss >> number;
+	std::istringstream iss(port);
+	int number;
+	iss >> number;
 	if (number < 1024 || number > 49151)
 		return (0);
-    return (number);
+	return (number);
 }
 
 void serverSocket::close_all() {
@@ -44,7 +44,7 @@ int serverSocket::CreateSocket(ConfigParser *pars) {
 		return(1);
 	}
 	for (std::vector<s_conf>::iterator it = pars->_config->begin(); it != pars->_config->end(); it++) {
-		if (!(port = stoint(it->port)))
+		if (!(port = translate_port(it->port)))
 			return (1);
 		this->srvskt = socket(AF_INET, SOCK_STREAM, 0);
 		if (this->srvskt == -1 ) {
@@ -106,35 +106,36 @@ void serverSocket::create_request(int fd) {
 }
 
 void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
+	(void)pars;
 	std::string request;
-    size_t bytesRead = 0;
-    char buf[1024];
-    for (size_t nb = 1; nb != 0 || nb != SIZE_T_MAX;) {
-        memset(buf, 0, sizeof(buf));
-        nb = recv(clientSocket, buf, sizeof(buf) - 1, MSG_DONTWAIT);
+	size_t bytesRead = 0;
+	char buf[1024];
+	for (size_t nb = 1; nb != 0 || nb != SIZE_T_MAX;) {
+		memset(buf, 0, sizeof(buf));
+		nb = recv(clientSocket, buf, sizeof(buf) - 1, MSG_DONTWAIT);
 		// std::cout << nb << std::endl;
 		if (nb == SIZE_T_MAX || bytesRead > SIZE_T_MAX/2)
 			break;
 		else
-        	bytesRead += nb;
-        request += std::string(buf, nb);
+			bytesRead += nb;
+		request += std::string(buf, nb);
 		// std::cout << "*******" <<request << std::endl;
 		// std::cout << "*******" << std::endl;
-    }
-    // char buffer[8192];//verifier si suffisant pour la methode post
-    // ssize_t bytesRead = read(clientSocket, buffer, sizeof(buffer));
+	}
+	// char buffer[8192];//verifier si suffisant pour la methode post
+	// ssize_t bytesRead = read(clientSocket, buffer, sizeof(buffer));
 	// std::cout << bytesRead << std::endl;
-    if (bytesRead > 0) {
-        // std::string request(buffer, bytesRead);
+	if (bytesRead > 0) {
+		// std::string request(buffer, bytesRead);
 		// std::cout << std::endl;
 		// std::cout << "-------- REQUEST RECEIVED --------" << std::endl;
 		// std::cout << request;
 		// std::cout << "----------------------------------" << std::endl;
-        requestHandler test(request);
-        std::string response = test.handleRequest();
-        write(clientSocket, response.c_str(), response.length());
-    }
-    close(clientSocket);
+		requestHandler test(request);
+		std::string response = test.handleRequest();
+		write(clientSocket, response.c_str(), response.length());
+	}
+	close(clientSocket);
 }
 
 serverSocket &serverSocket::operator=(serverSocket const &rhs) {//brouillon
