@@ -131,7 +131,7 @@ void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
 		// std::cout << "-------- REQUEST RECEIVED --------" << std::endl;
 		// std::cout << request;
 		// std::cout << "----------------------------------" << std::endl;
-		requestHandler test(request);
+		requestHandler test(request, pars);
 		std::string response = test.handleRequest();
 		write(clientSocket, response.c_str(), response.length());
 	}

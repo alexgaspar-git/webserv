@@ -21,6 +21,9 @@ enum Extensions {
 
 #include "CGIHandler.hpp"
 #include "utils.hpp"
+#include "ConfigParser.hpp"
+
+#include <vector>
 
 
 class requestHandler {
@@ -29,14 +32,16 @@ private:
     requestHandler();
     requestHandler(requestHandler const &obj);
     requestHandler &operator=(requestHandler const &obj);
+    std::vector<s_conf>::iterator _currentClient;
 public:
-    requestHandler(std::string const request);
+    requestHandler(std::string const request, ConfigParser *pars);
     ~requestHandler();
     void getFirstLine(std::string const &line);
     std::map<std::string, std::string> getMap();
     std::string handleRequest();
     std::string makeGetResponse();
     std::string makeErrorResponse(int err);
+    std::vector<s_conf>::iterator getCurrentClient(ConfigParser *pars);
 };
 
 std::string getStatusCode(int err);

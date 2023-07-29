@@ -16,6 +16,7 @@ ConfigParser::~ConfigParser() {
 
 ConfigParser &ConfigParser::operator=(ConfigParser const &rhs) {//a faire
 	(void)rhs;
+	std::cout << "badabim" << std::endl;
 	return (*this);
 }
 

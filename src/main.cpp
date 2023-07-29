@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 	ConfigParser pars;
 	if (pars.check_conf(conf))
 		return (1);
-	print_conf(&pars);
+	// print_conf(&pars);
 	int new_events;
 	serverSocket srv;
 	if (srv.CreateSocket(&pars))

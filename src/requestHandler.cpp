@@ -1,12 +1,13 @@
 #include "../includes/requestHandler.hpp"
 
-requestHandler::requestHandler(std::string const request) : _req() {
+requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient() {
     std::istringstream iss(request);
     std::string line;
     std::string body;
     bool isFirstLine = true;
     bool isInBody = false;
     while (std::getline(iss, line)) {
+        std::cout << line << std::endl;
         if (isFirstLine) {
             getFirstLine(line);
             isFirstLine = false;
@@ -27,6 +28,7 @@ requestHandler::requestHandler(std::string const request) : _req() {
             body += "\n";
         }
     }
+    _currentClient = getCurrentClient(pars);
     _req["body"] = body;
 }
 
@@ -49,10 +51,26 @@ std::map<std::string, std::string> requestHandler::getMap() {
     return _req;
 }
 
+std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *pars) {
+    std::vector<s_conf>::iterator it;
+    for (it = pars->_config->begin(); it != pars->_config->end(); it++) {
+        if (_req["Host"].find(it->port) != std::string::npos) {
+            std::cout << it->port << std::endl;
+            return it;
+        }
+    }
+    return it;
+}
+
 std::string requestHandler::handleRequest() {
     std::string path = _req["path"];
     std::string response;
     int ext = getExtension(path);
+
+    if (_req["body"].size() > _currentClient->body_size) {
+        return "#!413";
+    }
+
     if (ext == PY || ext == PHP) {
         CGIHandler cgi(_req, ext);
         response = cgi.initCGI();
