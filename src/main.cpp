@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 			if (srv._srvSocket->find(tmp_fd) != srv._srvSocket->end())
 				srv.create_request(tmp_fd);
 			else
-				srv.handle_request(tmp_fd);
+				srv.handle_request(tmp_fd, &pars);
 		}
 	}
 	return (0);

@@ -30,7 +30,7 @@ class serverSocket
 		int init_kqueue();
 		int CreateSocket(ConfigParser *pars);
 		void create_request(int fd);
-		void handle_request(int clientSocket);
+		void handle_request(int clientSocket, ConfigParser *pars);
 		void close_all();
 
 		int				getsrvskt() const;

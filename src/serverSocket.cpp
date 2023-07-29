@@ -105,15 +105,15 @@ void serverSocket::create_request(int fd) {
 	}
 }
 
-void serverSocket::handle_request(int clientSocket) {
+void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
 	std::string request;
-    ssize_t bytesRead = 0;
+    size_t bytesRead = 0;
     char buf[1024];
-    for (ssize_t nb = 1; nb > 0;) {
+    for (size_t nb = 1; nb != 0 || nb != SIZE_T_MAX;) {
         memset(buf, 0, sizeof(buf));
         nb = recv(clientSocket, buf, sizeof(buf) - 1, MSG_DONTWAIT);
 		// std::cout << nb << std::endl;
-		if (nb == -1)
+		if (nb == SIZE_T_MAX || bytesRead > SIZE_T_MAX/2)
 			break;
 		else
         	bytesRead += nb;
