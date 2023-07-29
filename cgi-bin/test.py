@@ -12,8 +12,6 @@ if "forme_de_maison" not in form:
 else:
     forme = form['forme_de_maison'].value
 
-print(form)
-
 print("""\
 <!DOCTYPE html>
 <html>

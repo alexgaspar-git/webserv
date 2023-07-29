@@ -28,13 +28,7 @@ requestHandler::requestHandler(std::string const request) : _req() {
         }
     }
     _req["body"] = body;
-    // std::cout << "++++++++++++BODY+++++++++++++++++++" << std::endl;
-    // std::cout << _req["body"] << std::endl;
-    // std::cout << "+++++++++++++++++++++++++++++++++++" << std::endl;
 }
-
-
-//trouve une maniere plus intelligente de skip les \r\n mec!!!!!!!!
 
 requestHandler::~requestHandler() {}
 
@@ -57,26 +51,21 @@ std::map<std::string, std::string> requestHandler::getMap() {
 
 std::string requestHandler::handleRequest() {
     std::string path = _req["path"];
-    int check = isCGI(path);
-    if (check != NOCGI) {
-        std::cout << "am i rentring la dedans" << std::endl;
-        CGIHandler cgi(_req, check);
-        std::string response = cgi.initCGI();
-        return response;
+    std::string response;
+    int ext = getExtension(path);
+    if (ext == PY || ext == PHP) {
+        CGIHandler cgi(_req, ext);
+        response = cgi.initCGI();
     } else {
-        if (_req["method"].compare("GET") != 0)
-            return makeErrorResponse(403);
-        return makeGetResponse();
+        response = makeGetResponse();
     }
+    return response;
 }
 
 std::string constructGetResponse(int status, std::ifstream &input) {
     std::string result =  HTTPVER + getStatusCode(status) + "\r\n";
     std::string content((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-    // std::cout << "CONTENT ========" << std::endl;
-    // std::cout << content << std::endl;
     size_t contentLen = content.size();
-    // std::cout << "============== content len: " << contentLen << std::endl;
     result += "Content-Length: " + std::to_string(contentLen) + "\r\n\r\n";
     result += content;
     return result;

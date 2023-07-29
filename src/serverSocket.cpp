@@ -107,6 +107,7 @@ void serverSocket::create_request(int fd) {
 
 void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
 	std::string request;
+	(void)pars;
     size_t bytesRead = 0;
     char buf[1024];
     for (size_t nb = 1; nb != 0 || nb != SIZE_T_MAX;) {

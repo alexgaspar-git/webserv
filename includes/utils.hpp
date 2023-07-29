@@ -14,6 +14,8 @@ int isCGI(std::string const path);
 std::string intToString(int value);
 std::string getStatusCode(int err);
 std::string cleanLine(std::string &line);
+int getExtension(std::string const path);
+void closer(int pipeA, int pipeB, int pipeC, int pipeD);
 
 
 #endif

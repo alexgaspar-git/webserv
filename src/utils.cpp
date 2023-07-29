@@ -22,16 +22,22 @@ std::string extractQueryString(const std::string &inputString) {
     return "";
 }
 
-int isCGI(std::string const path) {
-    size_t pos = path.find_last_of('.');
-    if (pos == std::string::npos)
-        return NOCGI;
-    std::string test = path.substr(pos);
-    if (test.compare(".py") == 0)
-        return PYTHON;
-    if (test.compare(".php") == 0)
+int getExtension(std::string const path) {
+    std::string ext;
+    std::string::size_type qmark = path.find("?");
+    if (qmark != std::string::npos)
+        return getExtension(path.substr(0, qmark));
+    std::string::size_type dot = path.find(".");
+    if (dot == std::string::npos)
+        return -1;
+    ext = path.substr(dot, path.size());
+    if (!ext.compare(".py"))
+        return PY; 
+    if (!ext.compare(".php"))
         return PHP;
-    return NOCGI;
+    if (!ext.compare(".html"))
+        return HTML;
+    return OTHER;
 }
 
 std::string intToString(int value) {
@@ -49,4 +55,15 @@ std::string getStatusCode(int err) {
         default:
             return "?";
     }
+}
+
+void closer(int pipeA, int pipeB, int pipeC, int pipeD) {
+    if (pipeA)
+        close(pipeA);
+    if (pipeB)
+        close(pipeB);
+    if (pipeC)
+        close(pipeC);
+    if (pipeD)
+        close(pipeD);
 }

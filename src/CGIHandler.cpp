@@ -1,8 +1,8 @@
 #include "CGIHandler.hpp"
 #include "utils.hpp"
 
-CGIHandler::CGIHandler(std::map<std::string, std::string> const &request, bool type) : _req(request), _body(), _path() {
-    if (type == PYTHON) {
+CGIHandler::CGIHandler(std::map<std::string, std::string> const &request, int type) : _req(request), _body(), _path() {
+    if (type == PY) {
         _path = strdup("/usr/bin/python3");
     } else {
         _path = strdup("/usr/bin/php");
@@ -27,7 +27,6 @@ const char** CGIHandler::getArgv() {
         path = "." + extractPathString(_req["path"]);
     } else {
         tmp[0] = strdup(php.c_str());
-        std::cout << "path: " << _req["path"] << std::endl;
         path = "./www" + extractPathString(_req["path"]);
     }
     tmp[1] = strdup(path.c_str());
@@ -64,7 +63,6 @@ const char **CGIHandler::getEnv() {
     
     for (size_t i = 0; i < tmp.size(); i++) {
         env[i] = strdup(tmp[i].c_str());
-        std::cout << env[i] << std::endl;
     }
     
     env[tmp.size()] = NULL;
@@ -79,18 +77,12 @@ bool CGIHandler::execCGI() {
     }
     int pid = fork();
     if (pid == -1) {
-        close(outPipe[0]);
-        close(outPipe[1]);
-        close(inPipe[0]);
-        close(inPipe[1]);
+        closer(outPipe[0], outPipe[1], inPipe[0], inPipe[1]);
     } 
     if (pid == 0) {
         dup2(outPipe[1], STDOUT_FILENO);
         dup2(inPipe[0], STDIN_FILENO);
-        close(inPipe[0]);
-        close(inPipe[1]);
-        close(outPipe[0]);
-        close(outPipe[1]);
+        closer(outPipe[0], outPipe[1], inPipe[0], inPipe[1]);
         execve(_path, (char* const*)_argv, (char* const*)_env);
     } else {
         close(outPipe[1]);
@@ -119,24 +111,17 @@ std::string CGIHandler::constructResponse() {
 }
 
 std::string CGIHandler::initCGI() {
-
     if (!execCGI()) {
         return "";
     }
-
     std::string response = constructResponse();
-
-    std::cout << response << std::endl;
-
     return response;
-
 }
 
 std::string extractBoundary(std::string &line) {
     std::string const boundaryStr = "boundary=";
     std::string::size_type boundPos = line.find_last_of('-');
     if (boundPos == std::string::npos) {
-        std::cout << "??" << std::endl;
         return "";
     };
     std::string ret = line.substr(boundPos + 1);
