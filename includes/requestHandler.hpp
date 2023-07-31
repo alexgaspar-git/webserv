@@ -9,7 +9,6 @@
 #include <fstream>
 
 #define HTTPVER "HTTP/1.1 "
-#define SITEPATH "www"
 #define ERRORPATH "www/error/"
 
 enum Extensions {
@@ -30,12 +29,14 @@ private:
     requestHandler(requestHandler const &obj);
     requestHandler &operator=(requestHandler const &obj);
     std::vector<s_conf>::iterator _currentClient;
+    std::string _sitePath;
 public:
     requestHandler(std::string const request, ConfigParser *pars);
     ~requestHandler();
     void getFirstLine(std::string const &line);
     std::map<std::string, std::string> getMap();
     std::string handleRequest();
+    void handlePath();
     std::string makeGetResponse();
     std::string makeErrorResponse(int err);
     std::vector<s_conf>::iterator getCurrentClient(ConfigParser *pars);

@@ -1,6 +1,6 @@
 #include "../includes/requestHandler.hpp"
 
-requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient() {
+requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www") {
     std::istringstream iss(request);
     std::string line;
     std::string body;
@@ -39,10 +39,20 @@ void requestHandler::getFirstLine(std::string const &line) {
     std::string word;
     int i = 0;
     while (iss >> word) {
-        _req[keys[i]] = word;
-        if (keys[i] == "path" && word == "/")
-            _req[keys[i]] += "index.html";
-        i++;
+        _req[keys[i++]] = word;
+    }
+}
+
+void requestHandler::handlePath() {
+    std::map<std::string, s_location>::iterator it;
+    for (it = _currentClient->location.begin(); it != _currentClient->location.end(); it++) {
+        std::string key = it->first;
+        if (_req["path"] == key || _req["path"] + "/" == key) {
+            _sitePath = _currentClient->location[key].root;
+            if (_req["path"] == key)
+                _sitePath += "/";
+            _req["path"] = _currentClient->location[key].index;
+        }
     }
 }
 
@@ -61,6 +71,7 @@ std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *par
 }
 
 std::string requestHandler::handleRequest() {
+    handlePath();
     std::string path = _req["path"];
     std::string response;
     int ext = getExtension(path);
@@ -82,16 +93,18 @@ std::string constructGetResponse(int status, std::ifstream &input) {
     std::string result =  HTTPVER + getStatusCode(status) + "\r\n";
     std::string content((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
     size_t contentLen = content.size();
-    result += "Content-Length: " + std::to_string(contentLen) + "\r\n\r\n";
+    result += "Content-Length: " + std::to_string(contentLen) + "\r\n";
+    result += "Set-Cookie: blabou\r\n";
+    result += "\r\n";
     result += content;
     return result;
 }
 
 std::string requestHandler::makeGetResponse() {
-    std::ifstream input(SITEPATH + _req["path"]);
+    std::ifstream input(_sitePath + _req["path"]);
     if (!input.is_open()) {
-        std::ifstream input(ERRORPATH + intToString(404) + ".html");
-        return constructGetResponse(404, input);
+        std::ifstream inputErr(ERRORPATH + intToString(404) + ".html");
+        return constructGetResponse(404, inputErr);
     }
     return constructGetResponse(200, input);
 }
