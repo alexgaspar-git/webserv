@@ -25,7 +25,6 @@ enum Extensions {
 
 #include <vector>
 
-
 class requestHandler {
 private:
     std::map<std::string, std::string>  _req;
