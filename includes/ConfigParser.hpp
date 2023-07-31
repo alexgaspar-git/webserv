@@ -43,6 +43,7 @@ typedef struct s_conf {
 	std::string port;
 	std::string name;
 	size_t body_size;
+	std::map<std::string, std::string> cookie;
 	std::map<std::string, s_location> location;
 } t_conf;
 
