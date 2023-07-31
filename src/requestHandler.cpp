@@ -7,7 +7,6 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
     bool isFirstLine = true;
     bool isInBody = false;
     while (std::getline(iss, line)) {
-        std::cout << line << std::endl;
         if (isFirstLine) {
             getFirstLine(line);
             isFirstLine = false;
@@ -55,7 +54,6 @@ std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *par
     std::vector<s_conf>::iterator it;
     for (it = pars->_config->begin(); it != pars->_config->end(); it++) {
         if (_req["Host"].find(it->port) != std::string::npos) {
-            std::cout << it->port << std::endl;
             return it;
         }
     }

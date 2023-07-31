@@ -23,8 +23,6 @@ enum Extensions {
 #include "utils.hpp"
 #include "ConfigParser.hpp"
 
-#include <vector>
-
 class requestHandler {
 private:
     std::map<std::string, std::string>  _req;
