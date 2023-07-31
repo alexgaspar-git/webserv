@@ -81,7 +81,7 @@ std::string requestHandler::handleRequest() {
     }
 
     if (ext == PY || ext == PHP) {
-        CGIHandler cgi(_req, ext);
+        CGIHandler cgi(_req, ext, _currentClient->cookie);
         response = cgi.initCGI();
     } else {
         response = makeGetResponse();
@@ -89,12 +89,15 @@ std::string requestHandler::handleRequest() {
     return response;
 }
 
-std::string constructGetResponse(int status, std::ifstream &input) {
+std::string requestHandler::constructGetResponse(int status, std::ifstream &input) {
     std::string result =  HTTPVER + getStatusCode(status) + "\r\n";
     std::string content((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
     size_t contentLen = content.size();
     result += "Content-Length: " + std::to_string(contentLen) + "\r\n";
-    result += "Set-Cookie: blabou\r\n";
+    if (_req["Cookie"].empty()) {
+        result += "Set-Cookie: cookieName\r\n";
+        _currentClient->cookie["cookieName"] = 1;
+    }
     result += "\r\n";
     result += content;
     return result;

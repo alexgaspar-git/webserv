@@ -39,6 +39,7 @@ public:
     void handlePath();
     std::string makeGetResponse();
     std::string makeErrorResponse(int err);
+    std::string constructGetResponse(int status, std::ifstream &input);
     std::vector<s_conf>::iterator getCurrentClient(ConfigParser *pars);
 };
 

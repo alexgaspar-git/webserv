@@ -18,9 +18,9 @@ private:
     const char **_argv;
     const char **_env;
     const char **getArgv();
-    const char **getEnv();
+    const char **getEnv(std::map<std::string, int> &cookie);
 public:
-    CGIHandler(std::map<std::string, std::string> const &request, int type);
+    CGIHandler(std::map<std::string, std::string> const &request, int type, std::map<std::string, int> &cookie);
     ~CGIHandler();
     std::string initCGI();
     bool execCGI();

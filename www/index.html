@@ -15,6 +15,7 @@
     <a href="page213123123.html"> error 404 </a>
     <a href="/autoindex.php">show images</a>
     <a href="/delete.php">delete images</a>
+    <a href="/cookie.php">coukille</a>
     <h2>Upload .txt File</h2>
     <form action="/cgi-bin/upload.py" method="post" enctype="multipart/form-data">
         <label for="file">Select a .txt file to upload:</label>
@@ -27,19 +28,5 @@
         <input type="file" id="file" name="filename" accept=".jpg">
         <input type="submit" value="Upload">
     </form>
-    <h1>Number: <span id="numberDisplay">0</span></h1>
-    <button id="incrementButton">Increment</button>
-    <script>
-        // Get a reference to the button and number display element
-        const incrementButton = document.getElementById("incrementButton");
-        const numberDisplay = document.getElementById("numberDisplay");
-
-        // Set an initial value for the number
-        let n = 0;
-        incrementButton.addEventListener("click", () => {
-            n++;
-            numberDisplay.textContent = n;
-        });
-    </script>
 </body>
 </html>
