@@ -45,13 +45,15 @@ void requestHandler::getFirstLine(std::string const &line) {
 
 void requestHandler::handlePath() {
     std::map<std::string, s_location>::iterator it;
+    std::cout << "path recue: " << PATH << std::endl;
     for (it = _currentClient->location.begin(); it != _currentClient->location.end(); it++) {
         std::string key = it->first;
         if (_req["path"] == key || _req["path"] + "/" == key) {
             _sitePath = _currentClient->location[key].root;
-            if (_req["path"] == key)
-                _sitePath += "/";
-            _req["path"] = _currentClient->location[key].index;
+            std::string a = _currentClient->location[key].root + "/";
+            a += _currentClient->location[key].index;
+            std::cout << "path parsée: " << a << std::endl;
+            PATH = a;
         }
     }
 }
@@ -101,7 +103,7 @@ std::string requestHandler::buildErrResponse(std::string const &body) {
 }
 
 std::string requestHandler::handleHTML() {
-    std::ifstream input(_sitePath + _req["path"]);
+    std::ifstream input(PATH);
     if (!input.is_open()) {
         return "$#404 Not Found";
     }

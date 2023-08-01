@@ -24,11 +24,10 @@ const char** CGIHandler::getArgv() {
     const char** tmp = new const char*[3];
     if (strcmp(_path, "/usr/bin/python3") == 0) {
         tmp[0] = strdup(py.c_str());
-        path = "." + extractPathString(_req["path"]);
     } else {
         tmp[0] = strdup(php.c_str());
-        path = "./www" + extractPathString(_req["path"]);
     }
+    path = extractPathString(_req["path"]);
     tmp[1] = strdup(path.c_str());
     tmp[2] = NULL;
 
@@ -110,4 +109,6 @@ std::string CGIHandler::initCGI() {
     };
     return _body;
 }
+
+// "/" == "./www/"
 

@@ -27,7 +27,7 @@ int getExtension(std::string const path) {
     std::string::size_type qmark = path.find("?");
     if (qmark != std::string::npos)
         return getExtension(path.substr(0, qmark));
-    std::string::size_type dot = path.find(".");
+    std::string::size_type dot = path.find_last_of(".");
     if (dot == std::string::npos)
         return -1;
     ext = path.substr(dot, path.size());
