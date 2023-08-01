@@ -72,27 +72,38 @@ std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *par
 
 std::string requestHandler::handleRequest() {
     std::string body;
-    std::string response;
-
+    if (REQBODY.size() > _currentClient->body_size) {
+        return buildErrResponse("$#413 Payload Too Large");
+    }
     handlePath();
     int ext = getExtension(PATH);
-
     if (ext == PY || ext == PHP) {
         CGIHandler cgi(_req, ext, _currentClient->cookie);
         body = cgi.initCGI();
     } else {
         body = handleHTML();
     }
+    if (isError(body)) {
+        return buildErrResponse(body);
+    } else {
+        return buildResponse(body);
+    }
+}
 
-    response = buildResponse(body);
-
+std::string requestHandler::buildErrResponse(std::string const &body) {
+    std::string errcode = body.substr(2);
+    std::string fof = "<html>\n<head>\n    <title>ERROR</title>\n</head>\n<body>\n    <h1 style=\"font-size: 100px; display: flex; justify-content: center; align-items: center; padding: 200px\">" + errcode + "</h1>\n</body>\n</html>";
+    std::string response = HTTPVER + errcode + "\r\n";
+    response += "Content-Length: " + intToString(fof.size()) + "\r\n";
+    response += "\r\n";
+    response += fof;
     return response;
 }
 
 std::string requestHandler::handleHTML() {
     std::ifstream input(_sitePath + _req["path"]);
     if (!input.is_open()) {
-        return "$#404";
+        return "$#404 Not Found";
     }
     std::string body((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
     return body;
@@ -108,7 +119,6 @@ std::string generatecookiename(std::map<std::string, int> cookie) {
     }
     if (cookie.count(tmp) != 0) {
         tmp = generatecookiename(cookie);
-        std::cout << "nooo" << std::endl;
     }
     return (tmp);
 }

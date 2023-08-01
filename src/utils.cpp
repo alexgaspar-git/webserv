@@ -46,17 +46,6 @@ std::string intToString(int value) {
     return ss.str();
 }
 
-std::string getStatusCode(int err) {
-    switch (err) {
-        case 200:
-            return "200 OK";
-        case 404:
-            return "404 Not Found";
-        default:
-            return "?";
-    }
-}
-
 void closer(int pipeA, int pipeB, int pipeC, int pipeD) {
     if (pipeA)
         close(pipeA);
@@ -66,4 +55,8 @@ void closer(int pipeA, int pipeB, int pipeC, int pipeD) {
         close(pipeC);
     if (pipeD)
         close(pipeD);
+}
+
+bool isError(std::string body) {
+    return body[0] == '$' && body[1] == '#';
 }

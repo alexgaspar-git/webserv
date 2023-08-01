@@ -60,10 +60,6 @@ const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
         if (_req["path"] == "/cookie.php")
             cookie[_req["Cookie"]]++;
     }
-    /*
-    tmp.push_back("HTTP_COOKIE="); a voir ce que ca fait
-    tmp.push_back("SCRIPT_NAME=" + path du script);
-    */
 
     const char** env = new const char*[tmp.size() + 1];
     
@@ -108,17 +104,9 @@ bool CGIHandler::execCGI() {
     return true;
 }
 
-std::string CGIHandler::constructResponse() {
-    std::string response = HTTPVER + getStatusCode(200) + "\r\n";
-    size_t contentLen = _body.size();
-    response += "Content-Length: " + std::to_string(contentLen) + "\r\n\r\n";
-    response += _body;
-    return response;
-}
-
 std::string CGIHandler::initCGI() {
     if (!execCGI()) {
-        return "";
+        return "$#500 Internal Server Error";
     };
     return _body;
 }
