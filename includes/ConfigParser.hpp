@@ -25,7 +25,6 @@ typedef struct s_default {
 	std::string autoindex;
 	std::string root;
 	std::string index;
-	std::string method;
 	std::string tmp_location;
 	std::map<std::string, std::string> error;
 } t_default;

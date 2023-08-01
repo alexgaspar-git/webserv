@@ -149,14 +149,6 @@ int ConfigParser::create_conf(std::string serv, int check) {
 				return (1);
 			}
 			break;
-		case METHOD:
-			if (this->_default_conf->method.empty())
-				this->_default_conf->method = serv.substr(this->_len2, this->_len - this->_len2);
-			else {
-				std::cerr << "error : multiple method option in serv conf" << std::endl;
-				return (1);
-			}
-			break;
 		case ERROR_PAGE:
 		{
 			size_t tmp = serv.find_first_of(" ", this->_len2);
@@ -191,7 +183,10 @@ int ConfigParser::create_conf(std::string serv, int check) {
 			}
 			break;
 		default:
-			break;
+		{
+			std::cerr << "invalid option in serv conf" << std::endl;
+			return (1);
+		}
 	}
 	return (0);
 }
@@ -268,8 +263,6 @@ void ConfigParser::fill_location(s_location *tmp_location) {//verif si tout est 
 	}
 	if (tmp_location->root.empty())
 		tmp_location->root = this->_default_conf->root;
-	if (tmp_location->method.empty())
-		tmp_location->method = this->_default_conf->method;
 	for (std::map<std::string, std::string>::iterator it = this->_default_conf->error.begin(); it != this->_default_conf->error.end(); it++) {
 		if (tmp_location->error.find(it->first) == tmp_location->error.end())
 			tmp_location->error.insert(std::pair<std::string, std::string>(it->first, it->second));
@@ -396,7 +389,6 @@ void ConfigParser::clear_conf() {
 	this->_default_conf->autoindex.clear();
 	this->_default_conf->root.clear();
 	this->_default_conf->index.clear();
-	this->_default_conf->method.clear();
 	this->_default_conf->tmp_location.clear();
 	this->_default_conf->error.clear();
 }
