@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
 	// print_conf(&pars);
 	int new_events;
 	serverSocket srv;
+    srand(time(NULL));
 	if (srv.CreateSocket(&pars))
 		return (1);
 	while (1) {

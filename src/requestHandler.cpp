@@ -98,12 +98,28 @@ std::string requestHandler::handleHTML() {
     return body;
 }
 
+std::string generatecookiename(std::map<std::string, int> cookie) {
+    std::string tmp;
+    std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    int len = charset.size();
+    for (int x = 0; x < 10; x++) {
+    	int i = rand() % len;
+        tmp += charset[i];
+    }
+    if (cookie.count(tmp) != 0) {
+        tmp = generatecookiename(cookie);
+        std::cout << "nooo" << std::endl;
+    }
+    return (tmp);
+}
+
 std::string requestHandler::buildResponse(std::string const &body) {
     std::string response = HTTPVER "200 OK\r\n";
     response += "Content-Length: " + intToString(body.size()) + "\r\n";
     if (_req["Cookie"].empty()) {
-        response += "Set-Cookie: cookieName\r\n";
-        _currentClient->cookie["cookieName"] = 0;
+        std::string cookieName = generatecookiename(_currentClient->cookie);
+        response += "Set-Cookie: " + cookieName + "\r\n";
+        _currentClient->cookie[cookieName] = 0;
     }
     response += "\r\n";
     response += body;
