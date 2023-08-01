@@ -6,6 +6,8 @@ CGIHandler::CGIHandler(std::map<std::string, std::string> const &request, int ty
         _path = strdup("/usr/bin/python3");
     } else {
         _path = strdup("/usr/bin/php");
+        if (_req["path"] == "/cookie.php")
+            cookie[_req["Cookie"]]++;
     }
     _argv = getArgv();
     _env = getEnv(cookie);
@@ -53,13 +55,7 @@ const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
     tmp.push_back("CONTENT_LENGTH=" + intToString(_req["body"].size()));
     tmp.push_back("CONTENT_TYPE=" + _req["Content-Type"]);
     tmp.push_back("UPLOAD_DIR=./www/uploads/");
-    if (!cookie[_req["Cookie"]]) {
-        cookie[_req["Cookie"]]++;
-        tmp.push_back("NUMBER=" + intToString(cookie[_req["Cookie"]]));
-        std::cout << cookie[_req["Cookie"]] << std::endl;
-    } else {
-        tmp.push_back("NUMBER=1");
-    }
+    tmp.push_back("NUMBER=" + intToString(cookie[_req["Cookie"]]));
     /*
     tmp.push_back("HTTP_COOKIE="); a voir ce que ca fait
     tmp.push_back("SCRIPT_NAME=" + path du script);

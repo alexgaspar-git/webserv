@@ -7,6 +7,7 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
     bool isFirstLine = true;
     bool isInBody = false;
     while (std::getline(iss, line)) {
+        std::cout << line << std::endl;
         if (isFirstLine) {
             getFirstLine(line);
             isFirstLine = false;
@@ -15,7 +16,7 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
         if (!isInBody) {
             std::string::size_type colonPos = line.find(":");
             std::string key = line.substr(0, colonPos);
-            std::string val = line.substr(colonPos + 1);
+            std::string val = line.substr(colonPos + 2);
             _req[key] = cleanLine(val);
         }
         if (line.find("\r\n") && line.size() == 1 && isInBody == false) {
@@ -86,6 +87,10 @@ std::string requestHandler::handleRequest() {
     } else {
         response = makeGetResponse();
     }
+
+    // std::cout << "|" << _req["Cookie"] << "|" << std::endl;
+    // std::cout << "|" << _currentClient->cookie[_req["Cookie"]] << "|" << std::endl;
+
     return response;
 }
 
@@ -95,8 +100,8 @@ std::string requestHandler::constructGetResponse(int status, std::ifstream &inpu
     size_t contentLen = content.size();
     result += "Content-Length: " + std::to_string(contentLen) + "\r\n";
     if (_req["Cookie"].empty()) {
-        result += "Set-Cookie: cookieName\r\n";
-        _currentClient->cookie["cookieName"] = 1;
+        result += "Set-Cookie:cookieName\r\n";
+        _currentClient->cookie["cookieName"] = 0;
     }
     result += "\r\n";
     result += content;
