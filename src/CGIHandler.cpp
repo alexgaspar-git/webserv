@@ -6,8 +6,6 @@ CGIHandler::CGIHandler(std::map<std::string, std::string> const &request, int ty
         _path = strdup("/usr/bin/python3");
     } else {
         _path = strdup("/usr/bin/php");
-        if (_req["path"] == "/cookie.php")
-            cookie[_req["Cookie"]]++;
     }
     _argv = getArgv();
     _env = getEnv(cookie);
@@ -55,7 +53,13 @@ const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
     tmp.push_back("CONTENT_LENGTH=" + intToString(_req["body"].size()));
     tmp.push_back("CONTENT_TYPE=" + _req["Content-Type"]);
     tmp.push_back("UPLOAD_DIR=./www/uploads/");
-    tmp.push_back("NUMBER=" + intToString(cookie[_req["Cookie"]]));
+    if (_req["Cookie"].size() == 0) {
+        tmp.push_back("NUMBER=0");
+    } else {
+        tmp.push_back("NUMBER=" + intToString(cookie[_req["Cookie"]]));
+        if (_req["path"] == "/cookie.php")
+            cookie[_req["Cookie"]]++;
+    }
     /*
     tmp.push_back("HTTP_COOKIE="); a voir ce que ca fait
     tmp.push_back("SCRIPT_NAME=" + path du script);
@@ -115,17 +119,7 @@ std::string CGIHandler::constructResponse() {
 std::string CGIHandler::initCGI() {
     if (!execCGI()) {
         return "";
-    }
-    std::string response = constructResponse();
-    return response;
+    };
+    return _body;
 }
 
-std::string extractBoundary(std::string &line) {
-    std::string const boundaryStr = "boundary=";
-    std::string::size_type boundPos = line.find_last_of('-');
-    if (boundPos == std::string::npos) {
-        return "";
-    };
-    std::string ret = line.substr(boundPos + 1);
-    return ret;
-}

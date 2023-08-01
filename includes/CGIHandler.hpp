@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <unistd.h>
+#include <stdexcept>
 
 #include "requestHandler.hpp"
 #include "utils.hpp"

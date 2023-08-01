@@ -7,7 +7,6 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
     bool isFirstLine = true;
     bool isInBody = false;
     while (std::getline(iss, line)) {
-        std::cout << line << std::endl;
         if (isFirstLine) {
             getFirstLine(line);
             isFirstLine = false;
@@ -72,52 +71,41 @@ std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *par
 }
 
 std::string requestHandler::handleRequest() {
-    handlePath();
-    std::string path = _req["path"];
+    std::string body;
     std::string response;
-    int ext = getExtension(path);
 
-    if (_req["body"].size() > _currentClient->body_size) {
-        return "#!413";
-    }
+    handlePath();
+    int ext = getExtension(PATH);
 
     if (ext == PY || ext == PHP) {
         CGIHandler cgi(_req, ext, _currentClient->cookie);
-        response = cgi.initCGI();
+        body = cgi.initCGI();
     } else {
-        response = makeGetResponse();
+        body = handleHTML();
     }
 
-    // std::cout << "|" << _req["Cookie"] << "|" << std::endl;
-    // std::cout << "|" << _currentClient->cookie[_req["Cookie"]] << "|" << std::endl;
+    response = buildResponse(body);
 
     return response;
 }
 
-std::string requestHandler::constructGetResponse(int status, std::ifstream &input) {
-    std::string result =  HTTPVER + getStatusCode(status) + "\r\n";
-    std::string content((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-    size_t contentLen = content.size();
-    result += "Content-Length: " + std::to_string(contentLen) + "\r\n";
-    if (_req["Cookie"].empty()) {
-        result += "Set-Cookie:cookieName\r\n";
-        _currentClient->cookie["cookieName"] = 0;
-    }
-    result += "\r\n";
-    result += content;
-    return result;
-}
-
-std::string requestHandler::makeGetResponse() {
+std::string requestHandler::handleHTML() {
     std::ifstream input(_sitePath + _req["path"]);
     if (!input.is_open()) {
-        std::ifstream inputErr(ERRORPATH + intToString(404) + ".html");
-        return constructGetResponse(404, inputErr);
+        return "$#404";
     }
-    return constructGetResponse(200, input);
+    std::string body((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+    return body;
 }
 
-std::string requestHandler::makeErrorResponse(int err) {
-    std::ifstream input(ERRORPATH + intToString(err) + ".html");
-    return constructGetResponse(err, input);
+std::string requestHandler::buildResponse(std::string const &body) {
+    std::string response = HTTPVER "200 OK\r\n";
+    response += "Content-Length: " + intToString(body.size()) + "\r\n";
+    if (_req["Cookie"].empty()) {
+        response += "Set-Cookie: cookieName\r\n";
+        _currentClient->cookie["cookieName"] = 0;
+    }
+    response += "\r\n";
+    response += body;
+    return response;
 }

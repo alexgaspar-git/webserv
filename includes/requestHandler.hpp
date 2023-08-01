@@ -10,6 +10,7 @@
 
 #define HTTPVER "HTTP/1.1 "
 #define ERRORPATH "www/error/"
+#define PATH _req["path"]
 
 enum Extensions {
     HTML,
@@ -39,6 +40,8 @@ public:
     void handlePath();
     std::string makeGetResponse();
     std::string makeErrorResponse(int err);
+    std::string buildResponse(std::string const &body);
+    std::string handleHTML();
     std::string constructGetResponse(int status, std::ifstream &input);
     std::vector<s_conf>::iterator getCurrentClient(ConfigParser *pars);
 };
