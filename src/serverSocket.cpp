@@ -110,8 +110,9 @@ void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
 	std::string request;
     size_t bytesRead = 0;
     char buf[1024];
-    for (size_t nb = 1; nb != 0 || nb != SIZE_T_MAX;) {
+    for (size_t nb = 1; nb != 0 && nb != SIZE_T_MAX;) {
         memset(buf, 0, sizeof(buf));
+		std::cout << "yo" << std::endl;
         nb = recv(clientSocket, buf, sizeof(buf) - 1, MSG_DONTWAIT);
 		if (nb == SIZE_T_MAX || bytesRead > SIZE_T_MAX/2)
 			break;

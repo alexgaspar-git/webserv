@@ -7,14 +7,13 @@
     <h1>DELETUMS</h1>
     <ul>
         <?php
-        $directory = './www/uploads/';
+        $directory = getenv('UPLOAD_DIR');
         $files = scandir($directory);
         foreach ($files as $file) {
             if ($file !== '.' && $file !== '..' && is_file($directory . $file)) {
                 $file_url = htmlspecialchars($directory . $file);
                 $file_name = htmlspecialchars($file);
-                // echo "<li><a href='./cgi-bin/delete.py?file=$file'><img src=\"$file_url\"></a></li>";
-                echo "<li><a href=\"./cgi-bin/delete.py?file=index.jpg\"><img src=\"./www/uploads/index.jpg\"></a></li>";
+                echo "<li><a href=\"./delete?file=$file\"><img src=\"./images/$file\"></a></li>";
             }
         }
         if (empty($files)) {

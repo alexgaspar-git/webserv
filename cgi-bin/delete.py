@@ -3,8 +3,8 @@ import cgi, os
 form = cgi.FieldStorage()
 
 if "file" in form:
-	if os.path.exists("./www/uploads/" + form['file'].value):
-		os.remove("./www/uploads/" + form['file'].value)
+	if os.path.exists("./www/images/" + form['file'].value):
+		os.remove("./www/images/" + form['file'].value)
 
 print("""<!DOCTYPE html>
 <html lang="en">

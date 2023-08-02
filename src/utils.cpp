@@ -37,6 +37,8 @@ int getExtension(std::string const path) {
         return PHP;
     if (!ext.compare(".html"))
         return HTML;
+    if (!ext.compare(".jpg"))
+        return JPEG;
     return OTHER;
 }
 

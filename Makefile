@@ -28,4 +28,4 @@ fclean: clean
 re: fclean all
 
 run: $(NAME)
-	./$(NAME)
+	./$(NAME) config_file/example.conf

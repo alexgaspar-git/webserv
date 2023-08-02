@@ -6,6 +6,7 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
     std::string body;
     bool isFirstLine = true;
     bool isInBody = false;
+    std::cout << "???" << std::endl;
     while (std::getline(iss, line)) {
         if (isFirstLine) {
             getFirstLine(line);
@@ -45,21 +46,61 @@ void requestHandler::getFirstLine(std::string const &line) {
 
 void requestHandler::handlePath() {
     std::map<std::string, s_location>::iterator it;
-    std::cout << "path recue: " << PATH << std::endl;
+    std::string oldPath = PATH;
+    std::string tmpDir;
+    std::string tmpFile;
+    std::string finalPath;
+    size_t pos2 = std::string::npos;
     for (it = _currentClient->location.begin(); it != _currentClient->location.end(); it++) {
         std::string key = it->first;
-        if (_req["path"] == key || _req["path"] + "/" == key) {
-            _sitePath = _currentClient->location[key].root;
-            std::string a = _currentClient->location[key].root + "/";
-            a += _currentClient->location[key].index;
-            std::cout << "path parsée: " << a << std::endl;
-            PATH = a;
+        size_t pos = oldPath.find_first_of("/", 1);
+        if (pos == std::string::npos)
+            pos2 = oldPath.find_first_of("?");
+        if (pos == std::string::npos && pos2 == std::string::npos) {
+            if (key.find(oldPath) != std::string::npos && key.length() == oldPath.length()) {
+                finalPath = _currentClient->location[key].root;
+                finalPath += _currentClient->location[key].index;
+                PATH = finalPath;
+                std::cout << "final path = " << finalPath << std::endl;
+                return;
+            }
+        } else {
+            if (pos2 == std::string::npos) {
+                tmpDir = oldPath.substr(0, pos);
+                tmpFile = oldPath.substr(pos);
+                if (key.find(tmpDir) != std::string::npos && key.length() == tmpDir.length()) {
+                    finalPath = _currentClient->location[key].root;
+                    finalPath += tmpFile;
+                    PATH = finalPath;
+                    std::cout << "final path = " << finalPath << std::endl;
+                    return;
+                }
+            } else {
+                std::string afterQ = oldPath.substr(pos2);
+                std::string tmpDir = oldPath.substr(0, pos2);
+                if (key.find(tmpDir) != std::string::npos && key.length() == tmpDir.length()) {
+                    finalPath = _currentClient->location[key].root;
+                    finalPath += _currentClient->location[key].index;
+                    finalPath += afterQ;
+                    PATH = finalPath;
+                    std::cout << "finalPath = " << finalPath << std::endl;
+                    return;
+                }
+            }
         }
     }
-}
-
-std::map<std::string, std::string> requestHandler::getMap() { 
-    return _req;
+    finalPath = _currentClient->location["/"].root;
+    if (oldPath.length() == 1) {
+        finalPath += _currentClient->location["/"].index;    
+    } else {
+        finalPath += oldPath;
+    }
+    PATH = finalPath;
+    // gerer "//////"
+    // comprendre comment ce code marche
+    // gerer methodes autorisees
+    // error page
+    // autoindex
 }
 
 std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *pars) {
@@ -73,6 +114,7 @@ std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *par
 }
 
 std::string requestHandler::handleRequest() {
+    std::cout << "Request received" << std::endl;
     std::string body;
     if (REQBODY.size() > _currentClient->body_size) {
         return buildErrResponse("$#413 Payload Too Large");

@@ -51,12 +51,12 @@ const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
     tmp.push_back("HTTP_ACCEPT_LANGUAGE=" + _req["Accept"]);
     tmp.push_back("CONTENT_LENGTH=" + intToString(_req["body"].size()));
     tmp.push_back("CONTENT_TYPE=" + _req["Content-Type"]);
-    tmp.push_back("UPLOAD_DIR=./www/uploads/");
+    tmp.push_back("UPLOAD_DIR=./www/images/");
     if (_req["Cookie"].size() == 0) {
         tmp.push_back("NUMBER=0");
     } else {
         tmp.push_back("NUMBER=" + intToString(cookie[_req["Cookie"]]));
-        if (_req["path"] == "/cookie.php")
+        if (_req["oldPath"] == "/cookie")
             cookie[_req["Cookie"]]++;
     }
 

@@ -5,3 +5,12 @@ faire .conf
 
 plus tard
 page html erreur
+
+// gerer "//////"
+// comprendre comment ce code marche
+// gerer methodes autorisees
+// error page
+// autoindex
+// proteger script python
+// remplacer directories hard codé par "UPLOAD_DIR"
+// check close file

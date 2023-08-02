@@ -17,6 +17,7 @@ enum Extensions {
     HTML,
     PHP,
     PY,
+    JPEG,
     OTHER
 };
 
@@ -36,7 +37,6 @@ public:
     requestHandler(std::string const request, ConfigParser *pars);
     ~requestHandler();
     void getFirstLine(std::string const &line);
-    std::map<std::string, std::string> getMap();
     std::string handleRequest();
     void handlePath();
     std::string makeGetResponse();
