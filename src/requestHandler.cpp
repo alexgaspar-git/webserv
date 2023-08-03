@@ -31,7 +31,6 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
     }
     std::cout << "_______endreq_______" << std::endl;
     _currentClient = getCurrentClient(pars);
-    _req["upload"] = _currentClient->location["/upload"].upload;
     _req["body"] = body;
 }
 
