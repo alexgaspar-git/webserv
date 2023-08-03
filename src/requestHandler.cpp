@@ -86,7 +86,8 @@ bool requestHandler::checkMethod(const s_location &locationData) {
     } else if (locationData.root.empty()) {
         _noRoot = true;
     } else if (locationData.index.empty() && locationData.autoindex == "off") {
-        _isForbidden = true;
+        if (locationData.root != "./www/images")
+            _isForbidden = true;
     } else if (locationData.index.empty() && locationData.autoindex == "on") {
         _isAutoIndex = true;
     }

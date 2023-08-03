@@ -51,7 +51,7 @@ const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
     tmp.push_back("HTTP_ACCEPT_LANGUAGE=" + _req["Accept"]);
     tmp.push_back("CONTENT_LENGTH=" + intToString(_req["body"].size()));
     tmp.push_back("CONTENT_TYPE=" + _req["Content-Type"]);
-    tmp.push_back("UPLOAD_DIR=./www/images");
+    tmp.push_back("UPLOAD_DIR=./www/images/");
     tmp.push_back("INDEXPATH=" + _req["autoindex"]);
 
     if (_req["Cookie"].size() == 0) {
@@ -72,6 +72,14 @@ const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
     return env;
 }
 
+void stopCGISig() {
+    std::signal(SIGINT, SIG_IGN);
+}
+
+void restoreCGISig() {
+    std::signal(SIGINT, SIG_DFL);
+}
+
 bool CGIHandler::execCGI() {
     int outPipe[2];
     int inPipe[2];
@@ -88,6 +96,7 @@ bool CGIHandler::execCGI() {
         closer(outPipe[0], outPipe[1], inPipe[0], inPipe[1]);
         execve(_path, (char* const*)_argv, (char* const*)_env);
     } else {
+        stopCGISig();
         close(outPipe[1]);
         close(inPipe[0]);
         if (write(inPipe[1], _req["body"].c_str(), _req["body"].size()) == -1) {
@@ -102,11 +111,12 @@ bool CGIHandler::execCGI() {
         close(outPipe[0]);
     }
     waitpid(pid, NULL, 0);
+    restoreCGISig();
     return true;
 }
 
 std::string CGIHandler::initCGI() {
-    if (!execCGI()) {
+    if (!execCGI() || _body.empty()) {
         return "$#500 Internal Server Error";
     };
     return _body;

@@ -2,9 +2,6 @@ import cgi
 
 form = cgi.FieldStorage()
 
-while True:
-    a = 1;
-
 if "ccnumber" not in form:
     cc = ":("
 else:

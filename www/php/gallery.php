@@ -20,7 +20,7 @@
     $files = scandir($directory);
     foreach ($files as $file) {
         if ($file !== '.' && $file !== '..' && is_file($directory . $file)) {
-            echo "<a href=\"./delete?file=$file\"><img src=\"./images/$file\"></a>";
+            echo "<a href=\"/delete?file=$file\"><img src=\"/images/$file\"></a>";
         }
     }
     ?>

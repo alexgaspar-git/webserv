@@ -6,6 +6,7 @@
 #include <string>
 #include <unistd.h>
 #include <stdexcept>
+#include <csignal>
 
 #include "requestHandler.hpp"
 #include "utils.hpp"
