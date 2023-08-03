@@ -1,14 +1,12 @@
 #include "../includes/requestHandler.hpp"
 
-requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false) {
+requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false), _badRequest(false) {
     std::istringstream iss(request);
     std::string line;
     std::string body;
     bool isFirstLine = true;
     bool isInBody = false;
-    std::cout << "_______req_______" << std::endl;
     while (std::getline(iss, line)) {
-        std::cout << line << std::endl;
         if (isFirstLine) {
             getFirstLine(line);
             isFirstLine = false;
@@ -29,7 +27,6 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
             body += "\n";
         }
     }
-    std::cout << "_______endreq_______" << std::endl;
     _currentClient = getCurrentClient(pars);
     _req["body"] = body;
 }
@@ -44,6 +41,8 @@ void requestHandler::getFirstLine(std::string const &line) {
     while (iss >> word) {
         _req[keys[i++]] = word;
     }
+    if (_req["path"].find("//") != std::string::npos)
+        _badRequest = true;
 }
 bool requestHandler::handlePath() {
     const std::string &oldPath = PATH;
@@ -76,12 +75,15 @@ bool requestHandler::handlePath() {
         }
     }
     PATH = finalPath;
-    std::cout << "final path = " << finalPath << "\n";
     return true;
 }
 
 bool requestHandler::checkMethod(const s_location &locationData) {
-    if (locationData.root.empty()) {
+    if (!locationData.redirect.empty()) {
+        _redirectLink = locationData.redirect.begin()->second;
+        _redirectCode = locationData.redirect.begin()->first;
+        return true;
+    } else if (locationData.root.empty()) {
         _noRoot = true;
     } else if (locationData.index.empty() && locationData.autoindex == "off") {
         _isForbidden = true;
@@ -111,6 +113,8 @@ std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *par
 }
 
 std::string requestHandler::handleRequest() {
+    if (_badRequest)
+        return buildErrResponse("$#400 Bad Request");
     if (REQBODY.size() > _currentClient->body_size)
         return buildErrResponse("$#413 Payload Too Large");
     if (!handlePath())
@@ -119,6 +123,9 @@ std::string requestHandler::handleRequest() {
         return buildErrResponse("$#403 Forbidden");
     if (_noRoot)
         return buildErrResponse("$#500 Internal Server Error");
+    if (_redirectCode != "") {
+        return buildRedirResponse();
+    }
     if (_isAutoIndex) {
         _req["autoindex"] = PATH;
         PATH = "./www/php/autoindex.php";
@@ -136,6 +143,12 @@ std::string requestHandler::handleRequest() {
     } else {
         return buildResponse(body);
     }
+}
+
+std::string const requestHandler::buildRedirResponse() {
+    std::string response = HTTPVER + _redirectCode + " MOVED PERMANENTLY\r\n";
+    response += "Location: " + _redirectLink;
+    return response;
 }
 
 bool requestHandler::defaultError(std::string const &errcode) {
@@ -172,6 +185,7 @@ std::string requestHandler::handleHTML(std::string const &path) {
         return "$#404 Not Found";
     }
     std::string body((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+    input.close();
     return body;
 }
 

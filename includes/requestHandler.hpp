@@ -37,6 +37,9 @@ private:
     bool _isForbidden;
     bool _isAutoIndex;
     bool _noRoot;
+    bool _badRequest;
+    std::string _redirectCode;
+    std::string _redirectLink;
 public:
     requestHandler(std::string const request, ConfigParser *pars);
     ~requestHandler();
@@ -52,6 +55,7 @@ public:
     bool defaultError(std::string const &errcode);
     bool checkMethod(const s_location &locationData);
     std::vector<s_conf>::iterator getCurrentClient(ConfigParser *pars);
+    std::string const buildRedirResponse();
 };
 
 std::string getStatusCode(int err);

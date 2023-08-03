@@ -66,7 +66,6 @@ const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
     
     for (size_t i = 0; i < tmp.size(); i++) {
         env[i] = strdup(tmp[i].c_str());
-        std::cout << env[i] << std::endl;
     }
     
     env[tmp.size()] = NULL;
@@ -91,9 +90,6 @@ bool CGIHandler::execCGI() {
     } else {
         close(outPipe[1]);
         close(inPipe[0]);
-        std::cout << "____body____" << std::endl;
-        std::cout << _req["body"] << std::endl;
-        std::cout << "_____endbody_______" << std::endl;
         if (write(inPipe[1], _req["body"].c_str(), _req["body"].size()) == -1) {
             return false;
         }

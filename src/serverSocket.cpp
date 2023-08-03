@@ -106,13 +106,11 @@ void serverSocket::create_request(int fd) {
 }
 
 void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
-	(void)pars;
 	std::string request;
     size_t bytesRead = 0;
     char buf[1024];
     for (size_t nb = 1; nb != 0 && nb != SIZE_T_MAX;) {
         memset(buf, 0, sizeof(buf));
-		std::cout << "yo" << std::endl;
         nb = recv(clientSocket, buf, sizeof(buf) - 1, MSG_DONTWAIT);
 		if (nb == SIZE_T_MAX || bytesRead > SIZE_T_MAX/2)
 			break;
@@ -121,8 +119,8 @@ void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
 		request += std::string(buf, nb);
 	}
 	if (bytesRead > 0) {
-		requestHandler test(request, pars);
-		std::string response = test.handleRequest();
+		requestHandler req(request, pars);
+		std::string response = req.handleRequest();
 		write(clientSocket, response.c_str(), response.length());
 	}
 	close(clientSocket);
