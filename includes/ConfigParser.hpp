@@ -19,6 +19,7 @@
 # define ROOT 7
 # define INDEX 8
 # define LOCATION 9
+# define REDIRECT 10
 
 typedef struct s_default {
 	std::string root;
@@ -33,6 +34,7 @@ typedef struct s_location {
 	std::string index;
 	std::string method;
 	std::map<std::string, std::string> error;
+	std::map<std::string, std::string> redirect;
 } t_location;
 
 typedef struct s_conf {

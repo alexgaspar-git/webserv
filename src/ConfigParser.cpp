@@ -25,14 +25,14 @@ int ConfigParser::check_result(std::string serv, int check) {
 		this->_len = serv.find_first_of(";", this->_len);
 	else
 		this->_len = serv.find_first_of("{", this->_len);
-	if (check != ERROR_PAGE && check != METHOD && check != LOCATION) {
+	if (check != ERROR_PAGE && check != METHOD && check != LOCATION && check != REDIRECT) {
 		size_t tmp = serv.find_first_of(" ", this->_len2);
 		if (tmp < this->_len){
 			std::cerr << "space in option" << std::endl;
 			return (1);
 		}
 	}
-	else if (check == ERROR_PAGE){
+	else if (check == ERROR_PAGE || check == REDIRECT){
 		size_t tmp = serv.find_first_of(" ", this->_len2);
 		if (tmp == std::string::npos || tmp > this->_len) {
 			std::cerr << "not enough space in option" << std::endl;
@@ -217,6 +217,14 @@ int ConfigParser::create_conf_location(std::string serv, int check, s_location *
 			tmp_location->error.insert(std::pair<std::string, std::string>(code, serv.substr(tmp, this->_len - tmp)));
 		}
 			break;
+		case REDIRECT:
+		{
+			size_t tmp = serv.find_first_of(" ", this->_len2);
+			std::string code = serv.substr(this->_len2, tmp - this->_len2);
+			tmp++;
+			tmp_location->redirect.insert(std::pair<std::string, std::string>(code, serv.substr(tmp, this->_len - tmp)));
+		}
+			break;
 		case ROOT:
 			if (tmp_location->root.empty())
 				tmp_location->root = serv.substr(this->_len2, this->_len - this->_len2);
@@ -265,6 +273,7 @@ int ConfigParser::check_option(std::string option) {
     list.insert(std::pair<std::string, int>("root", ROOT));
     list.insert(std::pair<std::string, int>("index", INDEX));
     list.insert(std::pair<std::string, int>("location", LOCATION));
+    list.insert(std::pair<std::string, int>("return", REDIRECT));
 
     if (list.find(option) == list.end())
 		return (0);
@@ -401,6 +410,8 @@ void print_conf(ConfigParser *pars){
 			std::cout << "method :" << m->second.method <<std::endl;
 			for (std::map<std::string, std::string>::iterator ma = m->second.error.begin(); ma != m->second.error.end(); ma++)
 				std::cout << "error :" << ma->first << " " << ma->second << std::endl;
+			for (std::map<std::string, std::string>::iterator ma = m->second.redirect.begin(); ma != m->second.redirect.end(); ma++)
+				std::cout << "redirect :" << ma->first << " " << ma->second << std::endl;
 		}
 	}
 	std::cout <<std::endl;
