@@ -9,6 +9,7 @@
 #include <fstream>
 
 #define HTTPVER "HTTP/1.1 "
+#define MTD _req["method"]
 #define ERRORPATH "www/error/"
 #define PATH _req["path"]
 #define REQBODY _req["body"]
@@ -38,7 +39,8 @@ public:
     ~requestHandler();
     void getFirstLine(std::string const &line);
     std::string handleRequest();
-    void handlePath();
+    bool handlePath();
+    bool checkMethod(const std::string& method);
     std::string makeGetResponse();
     std::string makeErrorResponse(int err);
     std::string buildResponse(std::string const &body);

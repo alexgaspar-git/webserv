@@ -2,43 +2,28 @@ import cgi
 
 form = cgi.FieldStorage()
 
-if "nom_du_pote" not in form:
-    nom = "rien du tout"
+if "ccnumber" not in form:
+    cc = ":("
 else:
-    nom = form['nom_du_pote'].value
+    cc = form['ccnumber'].value
 
-if "forme_de_maison" not in form:
-    forme = "rien du tout"
+if "cvv" not in form:
+    cvv = ":("
 else:
-    forme = form['forme_de_maison'].value
+    cvv = form['cvv'].value
 
 print("""\
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset='utf-8'/>
-        <title>Les infos !</title>
-        <style>
-            body {
-            background-color: rgb(246, 246, 246);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            }
-            p { font-size: 2em; }
-            img {
-            z-index: -1;
-            transform: rotate(26deg);
-            min-width: 50vw;
-            }
-            .premier { margin-bottom: -25px; }
-        </style>
-    </head>
-    <body>
-        <p class="premier">Ta maison s'apelle %s</p>
-        <p>Et ton pote est de forme %s</p>
-    </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Vbux</title>
+</head>
+<body>
+    <h2>Your credit card number is %s</h2>
+    <h2>3 numbers in the back are %s</h2>
+    <h2>Congratulations on the free fortnite gift card, the police has been called to your address.</h2>
+</body>
 </html>
-""" % (nom, forme))
+""" % (cc, cvv))

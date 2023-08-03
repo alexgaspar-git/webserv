@@ -6,8 +6,9 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
     std::string body;
     bool isFirstLine = true;
     bool isInBody = false;
-    std::cout << "???" << std::endl;
+    std::cout << "_______req_______" << std::endl;
     while (std::getline(iss, line)) {
+        std::cout << line << std::endl;
         if (isFirstLine) {
             getFirstLine(line);
             isFirstLine = false;
@@ -28,7 +29,9 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
             body += "\n";
         }
     }
+    std::cout << "_______endreq_______" << std::endl;
     _currentClient = getCurrentClient(pars);
+    _req["upload"] = _currentClient->location["/upload"].upload;
     _req["body"] = body;
 }
 
@@ -43,64 +46,54 @@ void requestHandler::getFirstLine(std::string const &line) {
         _req[keys[i++]] = word;
     }
 }
-
-void requestHandler::handlePath() {
-    std::map<std::string, s_location>::iterator it;
-    std::string oldPath = PATH;
-    std::string tmpDir;
-    std::string tmpFile;
+bool requestHandler::handlePath() {
+    const std::string &oldPath = PATH;
     std::string finalPath;
-    size_t pos2 = std::string::npos;
-    for (it = _currentClient->location.begin(); it != _currentClient->location.end(); it++) {
-        std::string key = it->first;
-        size_t pos = oldPath.find_first_of("/", 1);
-        if (pos == std::string::npos)
-            pos2 = oldPath.find_first_of("?");
-        if (pos == std::string::npos && pos2 == std::string::npos) {
-            if (key.find(oldPath) != std::string::npos && key.length() == oldPath.length()) {
-                finalPath = _currentClient->location[key].root;
-                finalPath += _currentClient->location[key].index;
-                PATH = finalPath;
-                std::cout << "final path = " << finalPath << std::endl;
-                return;
-            }
+
+    const std::map<std::string, s_location> &locations = _currentClient->location;
+    std::map<std::string, s_location>::const_iterator it;
+    for (it = locations.begin(); it != locations.end(); ++it) {
+        const std::string &key = it->first;
+        const s_location &locationData = it->second;
+
+        if (key == oldPath) {
+            finalPath = locationData.root + locationData.index;
+        } else if (oldPath.find(key + "/") == 0) {
+            finalPath = locationData.root + oldPath.substr(key.length());
+        } else if (oldPath.find(key + "?") == 0) {
+            finalPath = locationData.root + locationData.index + oldPath.substr(key.length());
         } else {
-            if (pos2 == std::string::npos) {
-                tmpDir = oldPath.substr(0, pos);
-                tmpFile = oldPath.substr(pos);
-                if (key.find(tmpDir) != std::string::npos && key.length() == tmpDir.length()) {
-                    finalPath = _currentClient->location[key].root;
-                    finalPath += tmpFile;
-                    PATH = finalPath;
-                    std::cout << "final path = " << finalPath << std::endl;
-                    return;
-                }
-            } else {
-                std::string afterQ = oldPath.substr(pos2);
-                std::string tmpDir = oldPath.substr(0, pos2);
-                if (key.find(tmpDir) != std::string::npos && key.length() == tmpDir.length()) {
-                    finalPath = _currentClient->location[key].root;
-                    finalPath += _currentClient->location[key].index;
-                    finalPath += afterQ;
-                    PATH = finalPath;
-                    std::cout << "finalPath = " << finalPath << std::endl;
-                    return;
-                }
-            }
+            continue;
+        }
+
+        if (!checkMethod(locationData.method)) {
+            return false;
         }
     }
-    finalPath = _currentClient->location["/"].root;
-    if (oldPath.length() == 1) {
-        finalPath += _currentClient->location["/"].index;    
-    } else {
-        finalPath += oldPath;
+
+    if (finalPath.empty()) {
+        std::map<std::string, s_location>::const_iterator defaultIt = locations.find("/");
+        if (defaultIt != locations.end()) {
+            const s_location &defaultLocation = defaultIt->second;
+            finalPath = defaultLocation.root + ((oldPath.length() == 1) ? defaultLocation.index : oldPath);
+        }
     }
     PATH = finalPath;
-    // gerer "//////"
-    // comprendre comment ce code marche
-    // gerer methodes autorisees
-    // error page
-    // autoindex
+    std::cout << "final path = " << finalPath << "\n";
+    return true;
+}
+
+bool requestHandler::checkMethod(const std::string& method) {
+    return method.find(MTD) != std::string::npos;
+}
+
+int countOccurrences(const std::string& str, char targetChar) {
+    int count = 0;
+    for (std::size_t i = 0; i < str.length(); ++i) {
+        if (str[i] == targetChar)
+            count++;
+    }
+    return count;
 }
 
 std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *pars) {
@@ -114,12 +107,13 @@ std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *par
 }
 
 std::string requestHandler::handleRequest() {
-    std::cout << "Request received" << std::endl;
     std::string body;
     if (REQBODY.size() > _currentClient->body_size) {
         return buildErrResponse("$#413 Payload Too Large");
     }
-    handlePath();
+    if (!handlePath()) {
+        return buildErrResponse("$#405 Method Not Allowed");
+    }
     int ext = getExtension(PATH);
     if (ext == PY || ext == PHP) {
         CGIHandler cgi(_req, ext, _currentClient->cookie);
@@ -136,6 +130,7 @@ std::string requestHandler::handleRequest() {
 
 std::string requestHandler::buildErrResponse(std::string const &body) {
     std::string errcode = body.substr(2);
+    //rajouter code ici pour error_page
     std::string fof = "<html>\n<head>\n    <title>ERROR</title>\n</head>\n<body>\n    <h1 style=\"font-size: 100px; display: flex; justify-content: center; align-items: center; padding: 200px\">" + errcode + "</h1>\n</body>\n</html>";
     std::string response = HTTPVER + errcode + "\r\n";
     response += "Content-Length: " + intToString(fof.size()) + "\r\n";

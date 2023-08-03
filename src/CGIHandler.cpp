@@ -51,12 +51,14 @@ const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
     tmp.push_back("HTTP_ACCEPT_LANGUAGE=" + _req["Accept"]);
     tmp.push_back("CONTENT_LENGTH=" + intToString(_req["body"].size()));
     tmp.push_back("CONTENT_TYPE=" + _req["Content-Type"]);
-    tmp.push_back("UPLOAD_DIR=./www/images/");
+    tmp.push_back("UPLOAD_DIR=" + _req["upload"] + "/");
+    // tmp.push_back("UPLOAD_DIR=./www/images");
+
     if (_req["Cookie"].size() == 0) {
         tmp.push_back("NUMBER=0");
     } else {
         tmp.push_back("NUMBER=" + intToString(cookie[_req["Cookie"]]));
-        if (_req["oldPath"] == "/cookie")
+        if (PATH.find("cookie") != std::string::npos)
             cookie[_req["Cookie"]]++;
     }
 
@@ -64,6 +66,7 @@ const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
     
     for (size_t i = 0; i < tmp.size(); i++) {
         env[i] = strdup(tmp[i].c_str());
+        std::cout << env[i] << std::endl;
     }
     
     env[tmp.size()] = NULL;
@@ -88,6 +91,9 @@ bool CGIHandler::execCGI() {
     } else {
         close(outPipe[1]);
         close(inPipe[0]);
+        std::cout << "____body____" << std::endl;
+        std::cout << _req["body"] << std::endl;
+        std::cout << "_____endbody_______" << std::endl;
         if (write(inPipe[1], _req["body"].c_str(), _req["body"].size()) == -1) {
             return false;
         }
