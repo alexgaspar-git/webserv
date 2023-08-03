@@ -141,14 +141,6 @@ int ConfigParser::create_conf(std::string serv, int check) {
 				return (1);
 			}
 			break;
-		case AUTO_INDEX:
-			if (this->_default_conf->autoindex.empty())
-				this->_default_conf->autoindex = serv.substr(this->_len2, this->_len - this->_len2);
-			else {
-				std::cerr << "error : multiple autoindex option in serv conf" << std::endl;
-				return (1);
-			}
-			break;
 		case ERROR_PAGE:
 		{
 			size_t tmp = serv.find_first_of(" ", this->_len2);
@@ -237,14 +229,6 @@ int ConfigParser::create_conf_location(std::string serv, int check, s_location *
 				return (1);
 			}
 			break;
-		case UPLOAD:
-			if (tmp_location->upload.empty())
-				tmp_location->upload = serv.substr(this->_len2, this->_len - this->_len2);
-			else {
-				std::cerr << "error : multiple upload option in location part" << std::endl;
-				return (1);
-			}
-			break;
 		default:
 		{
 			std::cerr << "invalide option in location" << std::endl;
@@ -255,12 +239,8 @@ int ConfigParser::create_conf_location(std::string serv, int check, s_location *
 }
 
 void ConfigParser::fill_location(s_location *tmp_location) {//verif si tout est good (default option)
-	if (tmp_location->autoindex.empty()) {
-		if (this->_default_conf->autoindex.empty())
-			tmp_location->autoindex = "off";
-		else
-			tmp_location->autoindex = this->_default_conf->autoindex;
-	}
+	if (tmp_location->autoindex.empty())
+		tmp_location->autoindex = "off";
 	if (tmp_location->root.empty())
 		tmp_location->root = this->_default_conf->root;
 	for (std::map<std::string, std::string>::iterator it = this->_default_conf->error.begin(); it != this->_default_conf->error.end(); it++) {
@@ -378,6 +358,17 @@ int ConfigParser::check_conf(std::string conf) {
 			this->_conf_file->body_size = 1000000;
 		this->_config->push_back(*this->_conf_file);
 	}
+	for (std::vector<s_conf>::iterator it = this->_config->begin(); it != this->_config->end(); it++) {
+		bool tmp = 0;
+		for (std::map<std::string, s_location>::iterator m = it->location.begin(); m != it->location.end(); m++) {
+			if (m->first == "/")
+				tmp = 1;
+		}
+		if (!tmp) {
+			std::cerr << "server need location root -> '/' to work" << std::endl;
+			return (1);
+		}
+	}
 	return (0);
 }
 
@@ -386,7 +377,6 @@ void ConfigParser::clear_conf() {
 	this->_conf_file->name.clear();
 	this->_conf_file->body_size = 0;
 	this->_conf_file->location.clear();
-	this->_default_conf->autoindex.clear();
 	this->_default_conf->root.clear();
 	this->_default_conf->index.clear();
 	this->_default_conf->tmp_location.clear();
@@ -405,7 +395,6 @@ void print_conf(ConfigParser *pars){
 			std::cout << "root :" << m->second.root <<std::endl;
 			std::cout << "index :" << m->second.index <<std::endl;
 			std::cout << "method :" << m->second.method <<std::endl;
-			std::cout << "upload :" << m->second.upload <<std::endl;
 			for (std::map<std::string, std::string>::iterator ma = m->second.error.begin(); ma != m->second.error.end(); ma++)
 				std::cout << "error :" << ma->first << " " << ma->second << std::endl;
 		}

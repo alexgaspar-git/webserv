@@ -22,7 +22,6 @@
 # define UPLOAD 10
 
 typedef struct s_default {
-	std::string autoindex;
 	std::string root;
 	std::string index;
 	std::string tmp_location;
@@ -34,7 +33,6 @@ typedef struct s_location {
 	std::string root;
 	std::string index;
 	std::string method;
-	std::string upload;
 	std::map<std::string, std::string> error;
 } t_location;
 
