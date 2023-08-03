@@ -52,6 +52,7 @@ const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
     tmp.push_back("CONTENT_LENGTH=" + intToString(_req["body"].size()));
     tmp.push_back("CONTENT_TYPE=" + _req["Content-Type"]);
     tmp.push_back("UPLOAD_DIR=./www/images");
+    tmp.push_back("INDEXPATH=" + _req["autoindex"]);
 
     if (_req["Cookie"].size() == 0) {
         tmp.push_back("NUMBER=0");

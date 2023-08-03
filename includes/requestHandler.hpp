@@ -34,13 +34,15 @@ private:
     requestHandler &operator=(requestHandler const &obj);
     std::vector<s_conf>::iterator _currentClient;
     std::string _sitePath;
+    bool _isForbidden;
+    bool _isAutoIndex;
+    bool _noRoot;
 public:
     requestHandler(std::string const request, ConfigParser *pars);
     ~requestHandler();
     void getFirstLine(std::string const &line);
     std::string handleRequest();
     bool handlePath();
-    bool checkMethod(const std::string& method);
     std::string makeGetResponse();
     std::string makeErrorResponse(int err);
     std::string buildResponse(std::string const &body);
@@ -48,6 +50,7 @@ public:
     std::string handleHTML(std::string const &path);
     std::string constructGetResponse(int status, std::ifstream &input);
     bool defaultError(std::string const &errcode);
+    bool checkMethod(const s_location &locationData);
     std::vector<s_conf>::iterator getCurrentClient(ConfigParser *pars);
 };
 

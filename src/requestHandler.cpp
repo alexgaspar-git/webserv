@@ -1,6 +1,6 @@
 #include "../includes/requestHandler.hpp"
 
-requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www") {
+requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false) {
     std::istringstream iss(request);
     std::string line;
     std::string body;
@@ -64,7 +64,7 @@ bool requestHandler::handlePath() {
         } else {
             continue;
         }
-        if (!checkMethod(locationData.method))
+        if (!checkMethod(locationData))
             return false;
     }
 
@@ -80,8 +80,15 @@ bool requestHandler::handlePath() {
     return true;
 }
 
-bool requestHandler::checkMethod(const std::string& method) {
-    return method.find(MTD) != std::string::npos;
+bool requestHandler::checkMethod(const s_location &locationData) {
+    if (locationData.root.empty()) {
+        _noRoot = true;
+    } else if (locationData.index.empty() && locationData.autoindex == "off") {
+        _isForbidden = true;
+    } else if (locationData.index.empty() && locationData.autoindex == "on") {
+        _isAutoIndex = true;
+    }
+    return locationData.method.find(MTD) != std::string::npos;
 }
 
 int countOccurrences(const std::string& str, char targetChar) {
@@ -104,14 +111,20 @@ std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *par
 }
 
 std::string requestHandler::handleRequest() {
-    std::string body;
-    if (REQBODY.size() > _currentClient->body_size) {
+    if (REQBODY.size() > _currentClient->body_size)
         return buildErrResponse("$#413 Payload Too Large");
-    }
-    if (!handlePath()) {
+    if (!handlePath())
         return buildErrResponse("$#405 Method Not Allowed");
+    if (_isForbidden)
+        return buildErrResponse("$#403 Forbidden");
+    if (_noRoot)
+        return buildErrResponse("$#500 Internal Server Error");
+    if (_isAutoIndex) {
+        _req["autoindex"] = PATH;
+        PATH = "./www/php/autoindex.php";
     }
     int ext = getExtension(PATH);
+    std::string body;
     if (ext == PY || ext == PHP) {
         CGIHandler cgi(_req, ext, _currentClient->cookie);
         body = cgi.initCGI();
