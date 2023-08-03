@@ -19,7 +19,6 @@
 # define ROOT 7
 # define INDEX 8
 # define LOCATION 9
-# define UPLOAD 10
 
 typedef struct s_default {
 	std::string root;

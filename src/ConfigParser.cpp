@@ -231,6 +231,7 @@ int ConfigParser::create_conf_location(std::string serv, int check, s_location *
 			break;
 		default:
 		{
+			std::cout << check << std::endl;
 			std::cerr << "invalide option in location" << std::endl;
 			return (1);
 		}
@@ -260,7 +261,6 @@ int ConfigParser::check_option(std::string option) {
     list.insert(std::pair<std::string, int>("root", ROOT));
     list.insert(std::pair<std::string, int>("index", INDEX));
     list.insert(std::pair<std::string, int>("location", LOCATION));
-    list.insert(std::pair<std::string, int>("upload", UPLOAD));
 
     if (list.find(option) == list.end())
 		return (0);
