@@ -22,7 +22,8 @@ function indexDirectory($directory)
 }
 
 // Usage example:
-$directoryToIndex = './www';
+$directoryToIndex = getenv('INDEXPATH');
+
 $index = indexDirectory($directoryToIndex);
 
 // Display the results
