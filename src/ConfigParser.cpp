@@ -219,10 +219,16 @@ int ConfigParser::create_conf_location(std::string serv, int check, s_location *
 			break;
 		case REDIRECT:
 		{
-			size_t tmp = serv.find_first_of(" ", this->_len2);
-			std::string code = serv.substr(this->_len2, tmp - this->_len2);
-			tmp++;
-			tmp_location->redirect.insert(std::pair<std::string, std::string>(code, serv.substr(tmp, this->_len - tmp)));
+			if (tmp_location->redirect.empty()) {
+				size_t tmp = serv.find_first_of(" ", this->_len2);
+				std::string code = serv.substr(this->_len2, tmp - this->_len2);
+				tmp++;
+				tmp_location->redirect.insert(std::pair<std::string, std::string>(code, serv.substr(tmp, this->_len - tmp)));
+			}
+			else {
+				std::cerr << "only one return per location is accepted" << std::endl;
+				return (1);
+			}
 		}
 			break;
 		case ROOT:
