@@ -196,6 +196,10 @@ int ConfigParser::create_conf_location(std::string serv, int check, s_location *
 				std::cerr << "error : multiple autoindex option in location part" << std::endl;
 				return (1);
 			}
+			if (!(tmp_location->autoindex.empty()) && tmp_location->autoindex != "off" && tmp_location->autoindex != "on") {
+				std::cerr << "autoindex can only be 'on' or 'off'" << std::endl;
+				return (1);
+			}
 			break;
 		case METHOD:
 			if (tmp_location->method.empty())
