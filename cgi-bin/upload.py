@@ -21,7 +21,7 @@ form = cgi.FieldStorage()
 if 'filename' in form:
     fi = form['filename']
 else:
-    fi = None  # or any other appropriate action if the key is not present.
+    fi = None
 
 
 if fi.filename:

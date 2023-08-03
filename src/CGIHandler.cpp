@@ -115,6 +115,3 @@ std::string CGIHandler::initCGI() {
     };
     return _body;
 }
-
-// "/" == "./www/"
-

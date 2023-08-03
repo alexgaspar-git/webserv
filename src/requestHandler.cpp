@@ -65,10 +65,8 @@ bool requestHandler::handlePath() {
         } else {
             continue;
         }
-
-        if (!checkMethod(locationData.method)) {
+        if (!checkMethod(locationData.method))
             return false;
-        }
     }
 
     if (finalPath.empty()) {
@@ -119,7 +117,7 @@ std::string requestHandler::handleRequest() {
         CGIHandler cgi(_req, ext, _currentClient->cookie);
         body = cgi.initCGI();
     } else {
-        body = handleHTML();
+        body = handleHTML(PATH);
     }
     if (isError(body)) {
         return buildErrResponse(body);
@@ -128,19 +126,36 @@ std::string requestHandler::handleRequest() {
     }
 }
 
+bool requestHandler::defaultError(std::string const &errcode) {
+    return !_currentClient->location["/"].error[errcode].empty();
+}
+
+
 std::string requestHandler::buildErrResponse(std::string const &body) {
-    std::string errcode = body.substr(2);
-    //rajouter code ici pour error_page
-    std::string fof = "<html>\n<head>\n    <title>ERROR</title>\n</head>\n<body>\n    <h1 style=\"font-size: 100px; display: flex; justify-content: center; align-items: center; padding: 200px\">" + errcode + "</h1>\n</body>\n</html>";
-    std::string response = HTTPVER + errcode + "\r\n";
-    response += "Content-Length: " + intToString(fof.size()) + "\r\n";
-    response += "\r\n";
-    response += fof;
+    std::string errmsg = body.substr(2);
+    std::string errcode = errmsg.substr(0, 3);
+    std::string response = HTTPVER + errmsg + "\r\n";
+    if (!defaultError(errcode)) {
+        std::string fof = "<html>\n<head>\n    <title>ERROR</title>\n</head>\n<body>\n    <h1 style=\"font-size: 100px; display: flex; justify-content: center; align-items: center; padding: 200px\">" + errmsg + "</h1>\n</body>\n</html>";
+        response += "Content-Length: " + intToString(fof.size()) + "\r\n";
+        response += "\r\n";
+        response += fof;
+    } else {
+        std::string errPath = _currentClient->location["/"].error[errcode];
+        std::string errBody = handleHTML(errPath);
+        if (isError(errBody)) {
+            _currentClient->location["/"].error[errcode] = "";
+            return buildErrResponse(errBody);
+        }
+        response += "Content-Length: " + intToString(errBody.size()) + "\r\n";
+        response += "\r\n";
+        response += errBody;
+    }
     return response;
 }
 
-std::string requestHandler::handleHTML() {
-    std::ifstream input(PATH);
+std::string requestHandler::handleHTML(std::string const &path) {
+    std::ifstream input(path);
     if (!input.is_open()) {
         return "$#404 Not Found";
     }
@@ -148,25 +163,11 @@ std::string requestHandler::handleHTML() {
     return body;
 }
 
-std::string generatecookiename(std::map<std::string, int> cookie) {
-    std::string tmp;
-    std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    int len = charset.size();
-    for (int x = 0; x < 10; x++) {
-    	int i = rand() % len;
-        tmp += charset[i];
-    }
-    if (cookie.count(tmp) != 0) {
-        tmp = generatecookiename(cookie);
-    }
-    return (tmp);
-}
-
 std::string requestHandler::buildResponse(std::string const &body) {
     std::string response = HTTPVER "200 OK\r\n";
     response += "Content-Length: " + intToString(body.size()) + "\r\n";
     if (_req["Cookie"].empty()) {
-        std::string cookieName = generatecookiename(_currentClient->cookie);
+        std::string cookieName = generateCookieName(_currentClient->cookie);
         response += "Set-Cookie: " + cookieName + "\r\n";
         _currentClient->cookie[cookieName] = 0;
     }

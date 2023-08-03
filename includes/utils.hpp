@@ -14,6 +14,7 @@ std::string cleanLine(std::string &line);
 int getExtension(std::string const path);
 void closer(int pipeA, int pipeB, int pipeC, int pipeD);
 bool isError(std::string body);
+std::string generateCookieName(std::map<std::string, int> cookie);
 
 
 #endif

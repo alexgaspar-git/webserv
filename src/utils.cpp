@@ -62,3 +62,17 @@ void closer(int pipeA, int pipeB, int pipeC, int pipeD) {
 bool isError(std::string body) {
     return body[0] == '$' && body[1] == '#';
 }
+
+std::string generateCookieName(std::map<std::string, int> cookie) {
+    std::string tmp;
+    std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    int len = charset.size();
+    for (int x = 0; x < 10; x++) {
+    	int i = rand() % len;
+        tmp += charset[i];
+    }
+    if (cookie.count(tmp) != 0) {
+        tmp = generateCookieName(cookie);
+    }
+    return (tmp);
+}

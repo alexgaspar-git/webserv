@@ -45,8 +45,9 @@ public:
     std::string makeErrorResponse(int err);
     std::string buildResponse(std::string const &body);
     std::string buildErrResponse(std::string const &body);
-    std::string handleHTML();
+    std::string handleHTML(std::string const &path);
     std::string constructGetResponse(int status, std::ifstream &input);
+    bool defaultError(std::string const &errcode);
     std::vector<s_conf>::iterator getCurrentClient(ConfigParser *pars);
 };
 

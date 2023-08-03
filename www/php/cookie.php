@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Print Environment Variable</title>
+    <title>Cookies</title>
 </head>
 <body>
-    <h1>Environment Variable "NUMBER":</h1>
+    <h1>Ghetto Cookie Clicker</h1>
     <?php
-    // Get the value of the "NUMBER" environment variable
     $number = getenv('NUMBER');
 
-    // Check if the variable is set and not empty
-    if ($number !== false && $number !== '') {
-        echo "<p>The value of the \"NUMBER\" environment variable is: $number</p>";
-    } else {
-        echo "<p>The \"NUMBER\" environment variable is not set or is empty.</p>";
-    }
+    echo "You have $number cookies."
+
     ?>
+    <button onClick="window.location.reload();">I require more.</button>
+    <a href="/">go back</a>
 </body>
 </html>

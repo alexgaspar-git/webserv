@@ -3,14 +3,9 @@
 #include "../includes/ConfigParser.hpp"
 
 int main(int argc, char **argv) {
-	(void)argv;
-	if (argc < 2){
-		std::cerr << "need a configuration file to launch the webserv." << std::endl;
-		return (1);
-	}
-	if (argc > 2){
-		std::cerr << "need only one configuration file to launch the webserv." << std::endl;
-		return (1);
+	if (argc != 2) {
+		std::cerr << "./webserv [conf file]" << std::endl;
+		return 1;
 	}
 	std::ifstream input(argv[1]);
 	if (!input.is_open()) {

@@ -27,5 +27,5 @@ fclean: clean
 
 re: fclean all
 
-run: $(NAME)
-	./$(NAME) config_file/example.conf
+test: $(NAME)
+	./$(NAME) conf/example.conf

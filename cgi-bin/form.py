@@ -24,6 +24,7 @@ print("""\
     <h2>Your credit card number is %s</h2>
     <h2>3 numbers in the back are %s</h2>
     <h2>Congratulations on the free fortnite gift card, the police has been called to your address.</h2>
+    <a href="/"> go back </a>
 </body>
 </html>
 """ % (cc, cvv))
