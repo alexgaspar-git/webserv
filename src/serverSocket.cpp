@@ -65,7 +65,7 @@ int serverSocket::CreateSocket(ConfigParser *pars) {
 			close(this->srvskt);
 			return (1);
 		}
-		if (listen(this->srvskt, 10) == -1) {
+		if (listen(this->srvskt, 50) == -1) {
 			std::cerr << "failed to listen on server socket. errno: " << errno << std::endl;
 			close(this->srvskt);
 			return (1);
@@ -86,7 +86,6 @@ void serverSocket::create_request(int fd) {
 	int clientSocket;
 	sockaddr_in clientAdress;
 	socklen_t cli_addrlen = sizeof(clientAdress);
-
 	clientSocket = accept(fd, reinterpret_cast<sockaddr *>(&clientAdress), &cli_addrlen);//change this->srvskt
 	if (clientSocket == -1) {
 		std::cerr << "failed to accept connection. errno: " << errno << std::endl;
@@ -99,6 +98,7 @@ void serverSocket::create_request(int fd) {
 	}
 	EV_SET(&this->event, clientSocket, EVFILT_READ, EV_ADD, 0, 0, NULL);
 	if (kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL) == -1) {
+		std::cout << "yo" << std::endl;
 		std::cerr << "failed to register event. errno: " << errno << std::endl;
 		close(clientSocket);
 		return;
