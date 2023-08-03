@@ -17,6 +17,5 @@ page html erreur
 si pas index et auto index off error page
 gerer l'upload avec un absolute path (checker si /upload location existe sinon ne fonctionne pas (pas sur de ca))
 
-		upload ./www/images;// a ajouter // absolute path pas a gerer
         retirer autoindex 
         check /
