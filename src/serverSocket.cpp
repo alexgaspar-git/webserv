@@ -40,7 +40,7 @@ void serverSocket::close_all() {
 int serverSocket::CreateSocket(ConfigParser *pars) {
 	int port;
 	if ((this->kqueue_fd = kqueue()) == -1) {
-		std::cerr << "failed to create kqueue. errno: " << errno << std::endl;
+		std::cerr << "failed to create kqueue." << std::endl;
 		return(1);
 	}
 	for (std::vector<s_conf>::iterator it = pars->_config->begin(); it != pars->_config->end(); it++) {
@@ -48,11 +48,11 @@ int serverSocket::CreateSocket(ConfigParser *pars) {
 			return (1);
 		this->srvskt = socket(AF_INET, SOCK_STREAM, 0);
 		if (this->srvskt == -1 ) {
-			std::cerr << "Failed to create socket. errno: " << errno << std::endl;
+			std::cerr << "Failed to create socket." << std::endl;
 			return (1);
 		}
 		if (fcntl(this->srvskt, F_SETFL, O_NONBLOCK) == -1) {
-			std::cerr << "fcntl failed. errno: " << errno << std::endl;
+			std::cerr << "fcntl failed." << std::endl;
 			close(this->srvskt);
 			return (1);
 		}
@@ -61,18 +61,18 @@ int serverSocket::CreateSocket(ConfigParser *pars) {
 		this->srvAdress.sin_port = htons(port);
 		this->addrlen = sizeof(this->srvAdress);
 		if (bind(this->srvskt, (sockaddr *)&this->srvAdress, this->addrlen) == -1) {
-			std::cerr << "failed to bind server socket. errno: " << errno << std::endl;
+			std::cerr << "failed to bind server socket." << std::endl;
 			close(this->srvskt);
 			return (1);
 		}
 		if (listen(this->srvskt, 50) == -1) {
-			std::cerr << "failed to listen on server socket. errno: " << errno << std::endl;
+			std::cerr << "failed to listen on server socket." << std::endl;
 			close(this->srvskt);
 			return (1);
 		}
 		EV_SET(&this->event, this->srvskt, EVFILT_READ, EV_ADD, 0, 0, NULL);
 		if (kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL) == -1) {
-			std::cerr << "failed to register event. errno: " << errno << std::endl;
+			std::cerr << "failed to register event." << std::endl;
 			close(this->srvskt);
 			return(1);
 		}
@@ -88,18 +88,18 @@ void serverSocket::create_request(int fd) {
 	socklen_t cli_addrlen = sizeof(clientAdress);
 	clientSocket = accept(fd, reinterpret_cast<sockaddr *>(&clientAdress), &cli_addrlen);//change this->srvskt
 	if (clientSocket == -1) {
-		std::cerr << "failed to accept connection. errno: " << errno << std::endl;
+		std::cerr << "failed to accept connection." << std::endl;
 		return;
 	}
 	if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1) {
-		std::cerr << "fcntl failed. errno: " << errno << std::endl;
+		std::cerr << "fcntl failed." << std::endl;
 		close(clientSocket);
 		return;
 	}
 	EV_SET(&this->event, clientSocket, EVFILT_READ, EV_ADD, 0, 0, NULL);
 	if (kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL) == -1) {
 		std::cout << "yo" << std::endl;
-		std::cerr << "failed to register event. errno: " << errno << std::endl;
+		std::cerr << "failed to register event." << std::endl;
 		close(clientSocket);
 		return;
 	}
