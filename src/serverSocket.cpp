@@ -5,10 +5,6 @@ serverSocket::serverSocket() {
 	this->_srvSocket = new std::map<int, std::string>;
 }
 
-serverSocket::serverSocket(serverSocket const &rhs) {
-	*this = rhs;
-}//brouillon
-
 serverSocket::~serverSocket() {
 	close_all();
 	delete this->_srvSocket;
@@ -86,7 +82,7 @@ void serverSocket::create_request(int fd) {
 	int clientSocket;
 	sockaddr_in clientAdress;
 	socklen_t cli_addrlen = sizeof(clientAdress);
-	clientSocket = accept(fd, reinterpret_cast<sockaddr *>(&clientAdress), &cli_addrlen);//change this->srvskt
+	clientSocket = accept(fd, reinterpret_cast<sockaddr *>(&clientAdress), &cli_addrlen);
 	if (clientSocket == -1) {
 		std::cerr << "failed to accept connection." << std::endl;
 		return;
@@ -98,7 +94,6 @@ void serverSocket::create_request(int fd) {
 	}
 	EV_SET(&this->event, clientSocket, EVFILT_READ, EV_ADD, 0, 0, NULL);
 	if (kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL) == -1) {
-		std::cout << "yo" << std::endl;
 		std::cerr << "failed to register event." << std::endl;
 		close(clientSocket);
 		return;
@@ -123,14 +118,13 @@ void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
 		std::string response = req.handleRequest();
 		write(clientSocket, response.c_str(), response.length());
 	}
-	close(clientSocket);
-}
 
-serverSocket &serverSocket::operator=(serverSocket const &rhs) {//brouillon
-	this->srvskt = rhs.srvskt;
-	this->srvAdress = rhs.srvAdress;
-	this->addrlen = rhs.addrlen;
-	return (*this);
+	EV_SET(&this->event, clientSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+	int resultDelete = kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL);
+	if (resultDelete == -1) {
+		std::cerr << "failed to delete event." << std::endl;
+	}
+	close(clientSocket);
 }
 
 int serverSocket::getsrvskt() const {

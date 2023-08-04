@@ -6,18 +6,10 @@ ConfigParser::ConfigParser() {
 	this->_default_conf = new s_default;
 }
 
-ConfigParser::ConfigParser(ConfigParser const &rhs) {(void)rhs;}//a faire
-
 ConfigParser::~ConfigParser() {
 	delete this->_config;
 	delete this->_conf_file;
 	delete this->_default_conf;
-}
-
-ConfigParser &ConfigParser::operator=(ConfigParser const &rhs) {//a faire
-	(void)rhs;
-	std::cout << "badabim" << std::endl;
-	return (*this);
 }
 
 int ConfigParser::check_result(std::string serv, int check) {
@@ -257,7 +249,7 @@ int ConfigParser::create_conf_location(std::string serv, int check, s_location *
 	return (0);
 }
 
-void ConfigParser::fill_location(s_location *tmp_location) {//verif si tout est good (default option)
+void ConfigParser::fill_location(s_location *tmp_location) {
 	if (tmp_location->autoindex.empty())
 		tmp_location->autoindex = "off";
 	if (tmp_location->root.empty())

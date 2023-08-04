@@ -24,7 +24,6 @@ class serverSocket
 		std::map<int, std::string> *_srvSocket;
 
 		serverSocket();
-		serverSocket(serverSocket const &src);
 		~serverSocket();
 		
 		int init_kqueue();
@@ -38,7 +37,6 @@ class serverSocket
 		sockaddr_in		getSrvAdress() const;
 		socklen_t		getAddrlen() const;
 
-		serverSocket &operator=(serverSocket const &rhs);
 };
 
 #endif

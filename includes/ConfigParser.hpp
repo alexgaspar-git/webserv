@@ -64,10 +64,7 @@ class ConfigParser
 	public:
 		std::vector<s_conf> *_config;
 		ConfigParser();
-		ConfigParser(ConfigParser const &src);
 		~ConfigParser();
-
-		ConfigParser &operator=(ConfigParser const &rhs);
 
 		int check_conf(std::string conf);
 };

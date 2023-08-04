@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
 	while (1) {
 		int tmp_fd;
 		struct kevent events[50];
-		new_events = kevent(srv.getKqueue_fd(), NULL, 0, events, 50, NULL);//protection kevent ?
+		new_events = kevent(srv.getKqueue_fd(), NULL, 0, events, 50, NULL);
 		for (int i = 0; i < new_events; i++) {
 			tmp_fd = events[i].ident;
 			if (srv._srvSocket->find(tmp_fd) != srv._srvSocket->end())
