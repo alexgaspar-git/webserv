@@ -26,6 +26,7 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
             body += line;
             body += "\n";
         }
+        _req["all"] += line;
     }
     _currentClient = getCurrentClient(pars);
     _req["body"] = body;
@@ -124,9 +125,8 @@ std::string requestHandler::handleRequest() {
         return buildErrResponse("$#403 Forbidden");
     if (_noRoot)
         return buildErrResponse("$#500 Internal Server Error");
-    if (_redirectCode != "") {
+    if (_redirectCode != "")
         return buildRedirResponse();
-    }
     if (_isAutoIndex) {
         _req["autoindex"] = PATH;
         PATH = "./www/php/autoindex.php";

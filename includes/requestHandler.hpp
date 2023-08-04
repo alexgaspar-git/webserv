@@ -28,10 +28,8 @@ enum Extensions {
 
 class requestHandler {
 private:
-    std::map<std::string, std::string>  _req;
     requestHandler();
-    requestHandler(requestHandler const &obj);
-    requestHandler &operator=(requestHandler const &obj);
+    std::map<std::string, std::string>  _req;
     std::vector<s_conf>::iterator _currentClient;
     std::string _sitePath;
     bool _isForbidden;
@@ -46,12 +44,9 @@ public:
     void getFirstLine(std::string const &line);
     std::string handleRequest();
     bool handlePath();
-    std::string makeGetResponse();
-    std::string makeErrorResponse(int err);
     std::string buildResponse(std::string const &body);
     std::string buildErrResponse(std::string const &body);
     std::string handleHTML(std::string const &path);
-    std::string constructGetResponse(int status, std::ifstream &input);
     bool defaultError(std::string const &errcode);
     bool checkMethod(const s_location &locationData);
     std::vector<s_conf>::iterator getCurrentClient(ConfigParser *pars);
