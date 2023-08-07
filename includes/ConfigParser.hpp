@@ -60,13 +60,16 @@ class ConfigParser
 		int handle_location(std::string serv);
 		int check_option(std::string option);
 		void fill_location(s_location *tmp_location);
+		int check_root();
+		int check_port();
 		void clear_conf();
 	public:
-		std::vector<s_conf> *_config;
 		ConfigParser();
 		~ConfigParser();
 
 		int check_conf(std::string conf);
+
+		std::vector<s_conf> *_config;
 };
 
 void print_conf(ConfigParser *pars);

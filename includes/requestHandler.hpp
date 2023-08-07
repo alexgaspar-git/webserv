@@ -40,6 +40,7 @@ private:
     std::string _redirectCode;
     std::string _redirectLink;
 public:
+    bool _noCurrentClient;
     requestHandler(std::string const request, ConfigParser *pars);
     ~requestHandler();
     bool getFirstLine(std::string const &line);
