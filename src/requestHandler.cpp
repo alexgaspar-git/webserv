@@ -1,12 +1,13 @@
 #include "../includes/requestHandler.hpp"
 
-requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false), _badRequest(false) {
+requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false), _badRequest(false), _noCurrentClient(false) {
     std::istringstream iss(request);
     std::string line;
     std::string body;
     bool isFirstLine = true;
     bool isInBody = false;
     while (std::getline(iss, line)) {
+        std::cout << line << std::endl;
         if (isFirstLine) {
             getFirstLine(line);
             isFirstLine = false;
@@ -14,9 +15,11 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
         }
         if (!isInBody) {
             std::string::size_type colonPos = line.find(":");
-            std::string key = line.substr(0, colonPos);
-            std::string val = line.substr(colonPos + 2);
-            _req[key] = cleanLine(val);
+            if (colonPos != std::string::npos) {
+                std::string key = line.substr(0, colonPos);
+                std::string val = line.substr(colonPos + 2);
+                _req[key] = cleanLine(val);
+            }
         }
         if (line.find("\r\n") && line.size() == 1 && isInBody == false) {
             isInBody = true;
@@ -80,6 +83,9 @@ bool requestHandler::handlePath() {
 }
 
 bool requestHandler::checkMethod(const s_location &locationData) {
+    if (locationData.index == "/delete.py"
+        && locationData.method.find("DELETE") == std::string::npos)
+        return false;
     if (!locationData.redirect.empty()) {
         _redirectLink = locationData.redirect.begin()->second;
         _redirectCode = locationData.redirect.begin()->first;
@@ -107,10 +113,14 @@ int countOccurrences(const std::string& str, char targetChar) {
 std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *pars) {
     std::vector<s_conf>::iterator it;
     for (it = pars->_config->begin(); it != pars->_config->end(); it++) {
-        if (_req["Host"].find(it->port) != std::string::npos) {
+        if (_req["Host"].find(it->port) != std::string::npos
+            && (_req["Host"].find(it->name + ":" + it->port) == 0
+            || _req["Host"].find("localhost:" + it->port) == 0)) {
             return it;
         }
     }
+    std::cerr << "Client error." << std::endl;
+    _noCurrentClient = true;
     return it;
 }
 

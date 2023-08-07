@@ -342,6 +342,38 @@ int ConfigParser::check_server(std::string serv) {
 	return (0);
 }
 
+int ConfigParser::check_root() {
+	for (std::vector<s_conf>::iterator it = this->_config->begin(); it != this->_config->end(); it++) {
+		bool tmp = 0;
+		for (std::map<std::string, s_location>::iterator m = it->location.begin(); m != it->location.end(); m++) {
+			if (m->first == "/")
+				tmp = 1;
+		}
+		if (!tmp) {
+			std::cerr << "server need location root -> '/' to work" << std::endl;
+			return (1);
+		}
+		if (it->port.empty()){
+			std::cerr << "server need a port to work" << std::endl;
+			return (1);
+		}
+	}
+	return (0);
+}
+
+int ConfigParser::check_port() {
+	for (std::vector<s_conf>::iterator it = this->_config->begin(); it != this->_config->end(); it++) {
+		std::string tmp = it->port;
+		for (std::vector<s_conf>::iterator itt = it + 1; itt != this->_config->end(); itt++) {
+			if (tmp == itt->port) {
+				std::cerr << "repeated port forbidden" << std::endl;
+				return (1);
+			}
+		}
+	}
+	return (0);
+}
+
 int ConfigParser::check_conf(std::string conf) {
 	size_t len_max = conf.length();
 	size_t len = conf.find("server {");
@@ -369,17 +401,10 @@ int ConfigParser::check_conf(std::string conf) {
 			this->_conf_file->body_size = 1000000;
 		this->_config->push_back(*this->_conf_file);
 	}
-	for (std::vector<s_conf>::iterator it = this->_config->begin(); it != this->_config->end(); it++) {
-		bool tmp = 0;
-		for (std::map<std::string, s_location>::iterator m = it->location.begin(); m != it->location.end(); m++) {
-			if (m->first == "/")
-				tmp = 1;
-		}
-		if (!tmp) {
-			std::cerr << "server need location root -> '/' to work" << std::endl;
-			return (1);
-		}
-	}
+	if (this->check_root())
+		return (1);
+	if (this->check_port())
+		return (1);
 	return (0);
 }
 
