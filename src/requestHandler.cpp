@@ -1,13 +1,12 @@
 #include "../includes/requestHandler.hpp"
 
-requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false), _badRequest(false), _isHTTPS(false) {
+requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false), _badRequest(false), _isHTTPS(false), _noCurrentClient(false) {
     std::istringstream iss(request);
     std::string line;
     std::string body;
     bool isFirstLine = true;
     bool isInBody = false;
     while (std::getline(iss, line)) {
-        std::cout << line << std::endl;
         if (isFirstLine) {
             if (!getFirstLine(line)) {
                 return ;
