@@ -107,8 +107,10 @@ void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
     for (size_t nb = 1; nb != 0 && nb != SIZE_T_MAX;) {
         memset(buf, 0, sizeof(buf));
         nb = recv(clientSocket, buf, sizeof(buf) - 1, MSG_DONTWAIT);
-		if (nb == SIZE_T_MAX || bytesRead > SIZE_T_MAX/2)
+		if (nb == SIZE_T_MAX || bytesRead > SIZE_T_MAX/2) {
+			bytesRead = -1;
 			break;
+		}
 		else
 			bytesRead += nb;
 		request += std::string(buf, nb);
@@ -116,9 +118,9 @@ void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
 	if (bytesRead > 0) {
 		requestHandler req(request, pars);
 		std::string response = req.handleRequest();
-		write(clientSocket, response.c_str(), response.length());
+		if (write(clientSocket, response.c_str(), response.length()) <= 0)
+			std::cerr << "write didn't work properly" <<std::endl;
 	}
-
 	EV_SET(&this->event, clientSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
 	int resultDelete = kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL);
 	if (resultDelete == -1) {

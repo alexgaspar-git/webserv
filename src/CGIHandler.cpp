@@ -99,7 +99,7 @@ bool CGIHandler::execCGI() {
         stopCGISig();
         close(outPipe[1]);
         close(inPipe[0]);
-        if (write(inPipe[1], _req["body"].c_str(), _req["body"].size()) == -1) {
+        if (write(inPipe[1], _req["body"].c_str(), _req["body"].size()) <= 0) {
             return false;
         }
         close(inPipe[1]);
