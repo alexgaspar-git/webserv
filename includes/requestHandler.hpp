@@ -36,12 +36,13 @@ private:
     bool _isAutoIndex;
     bool _noRoot;
     bool _badRequest;
+    bool _isHTTPS;
     std::string _redirectCode;
     std::string _redirectLink;
 public:
     requestHandler(std::string const request, ConfigParser *pars);
     ~requestHandler();
-    void getFirstLine(std::string const &line);
+    bool getFirstLine(std::string const &line);
     std::string handleRequest();
     bool handlePath();
     std::string buildResponse(std::string const &body);

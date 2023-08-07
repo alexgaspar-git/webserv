@@ -1,6 +1,6 @@
 #include "../includes/requestHandler.hpp"
 
-requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false), _badRequest(false) {
+requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false), _badRequest(false), _isHTTPS(false) {
     std::istringstream iss(request);
     std::string line;
     std::string body;
@@ -8,7 +8,9 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
     bool isInBody = false;
     while (std::getline(iss, line)) {
         if (isFirstLine) {
-            getFirstLine(line);
+            if (!getFirstLine(line)) {
+                return ;
+            }
             isFirstLine = false;
             continue;
         }
@@ -34,9 +36,13 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
 
 requestHandler::~requestHandler() {}
 
-void requestHandler::getFirstLine(std::string const &line) {
+bool requestHandler::getFirstLine(std::string const &line) {
     std::string keys[3] = {"method", "path", "version"};
     std::istringstream iss(line);
+    if (line.find("HTTP") == std::string::npos) {
+        _isHTTPS = true;
+        return false;
+    }
     std::string word;
     int i = 0;
     while (iss >> word) {
@@ -44,7 +50,9 @@ void requestHandler::getFirstLine(std::string const &line) {
     }
     if (_req["path"].find("//") != std::string::npos)
         _badRequest = true;
+    return true;
 }
+
 bool requestHandler::handlePath() {
     const std::string &oldPath = PATH;
     std::string finalPath;
@@ -80,6 +88,9 @@ bool requestHandler::handlePath() {
 }
 
 bool requestHandler::checkMethod(const s_location &locationData) {
+    if (locationData.index == "/delete.py"
+        && locationData.method.find("DELETE") == std::string::npos)
+        return false;
     if (!locationData.redirect.empty()) {
         _redirectLink = locationData.redirect.begin()->second;
         _redirectCode = locationData.redirect.begin()->first;
@@ -87,8 +98,9 @@ bool requestHandler::checkMethod(const s_location &locationData) {
     } else if (locationData.root.empty()) {
         _noRoot = true;
     } else if (locationData.index.empty() && locationData.autoindex == "off") {
-        if (locationData.root != "./www/images")
+        if (locationData.root != "./www/images") {
             _isForbidden = true;
+        }
     } else if (locationData.index.empty() && locationData.autoindex == "on") {
         _isAutoIndex = true;
     }
@@ -115,6 +127,8 @@ std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *par
 }
 
 std::string requestHandler::handleRequest() {
+    if (_isHTTPS)
+        return "https";
     if (_badRequest)
         return buildErrResponse("$#400 Bad Request");
     if (REQBODY.size() > _currentClient->body_size)
