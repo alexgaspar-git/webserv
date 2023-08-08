@@ -116,12 +116,18 @@ void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
 		request += std::string(buf, nb);
 	}
 	if (bytesRead > 0) {
-		requestHandler req(request, pars);
-		if (!req._noCurrentClient) {
-			std::string response = req.handleRequest();
-			if (write(clientSocket, response.c_str(), response.length()) <= 0)
-				std::cerr << "write didn't work properly" <<std::endl;
+		int port;
+		if (getsockname(clientSocket, (struct sockaddr*)&srvAdress, &addrlen) == 0) {
+			port = ntohs(srvAdress.sin_port);
+			requestHandler req(request, pars, port);
+			if (!req._noCurrentClient) {
+				std::string response = req.handleRequest();
+				if (write(clientSocket, response.c_str(), response.length()) <= 0)
+					std::cerr << "write didn't work properly" <<std::endl;
+			}
 		}
+		else
+			std::cerr << "could not get port" << std::endl;
 	}
 	EV_SET(&this->event, clientSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
 	int resultDelete = kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL);

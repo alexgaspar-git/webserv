@@ -1,6 +1,6 @@
 #include "../includes/requestHandler.hpp"
 
-requestHandler::requestHandler(std::string const request, ConfigParser *pars) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false), _badRequest(false), _isHTTPS(false), _noCurrentClient(false) {
+requestHandler::requestHandler(std::string const request, ConfigParser *pars, int port) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false), _badRequest(false), _isHTTPS(false), _noCurrentClient(false) {
     std::istringstream iss(request);
     std::string line;
     std::string body;
@@ -32,7 +32,7 @@ requestHandler::requestHandler(std::string const request, ConfigParser *pars) : 
         }
         _req["all"] += line;
     }
-    _currentClient = getCurrentClient(pars);
+    _currentClient = getCurrentClient(pars, port);
     _req["body"] = body;
 }
 
@@ -118,12 +118,12 @@ int countOccurrences(const std::string& str, char targetChar) {
     return count;
 }
 
-std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *pars) {
+std::vector<s_conf>::iterator requestHandler::getCurrentClient(ConfigParser *pars, int port) {
     std::vector<s_conf>::iterator it;
     for (it = pars->_config->begin(); it != pars->_config->end(); it++) {
-        if (_req["Host"].find(it->port) != std::string::npos
-            && (_req["Host"].find(it->name + ":" + it->port) == 0
-            || _req["Host"].find("localhost:" + it->port) == 0)) {
+        if (intToString(port).find(it->port) != std::string::npos
+        && (_req["Host"].find(it->name + ":" + it->port) == 0
+        || _req["Host"].find("localhost:" + it->port) == 0)) {
             return it;
         }
     }

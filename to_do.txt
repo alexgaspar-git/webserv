@@ -1,6 +1,0 @@
-protect /recv/write check 0 et -1 !! V
-check chatgpt "Setup multiple servers with different hostnames (use something like: curl --resolve example.com:80:127.0.0.1 http://example.com/)." yan
-check delete "Setup a list of methods accepted for a certain route (e.g., try to delete something with and without permission)."
-test "UNKNOWN requests should not result in a crash." ca marche pitertre
-test "In the configuration, try to setup the same port multiple times. It should not work." conf
-test "Verify there is no memory leak (Monitor the process memory usage. It should not go up indefinitely)." yan

@@ -41,7 +41,7 @@ private:
     std::string _redirectLink;
 public:
     bool _noCurrentClient;
-    requestHandler(std::string const request, ConfigParser *pars);
+    requestHandler(std::string const request, ConfigParser *pars, int port);
     ~requestHandler();
     bool getFirstLine(std::string const &line);
     std::string handleRequest();
@@ -51,7 +51,7 @@ public:
     std::string handleHTML(std::string const &path);
     bool defaultError(std::string const &errcode);
     bool checkMethod(const s_location &locationData);
-    std::vector<s_conf>::iterator getCurrentClient(ConfigParser *pars);
+    std::vector<s_conf>::iterator getCurrentClient(ConfigParser *pars, int port);
     std::string const buildRedirResponse();
 };
 
