@@ -52,6 +52,7 @@ bool requestHandler::getFirstLine(std::string const &line) {
     }
     if (_req["path"].find("//") != std::string::npos)
         _badRequest = true;
+    std::cout << "first path = " << _req["path"] << std::endl;
     return true;
 }
 
@@ -86,6 +87,8 @@ bool requestHandler::handlePath() {
         }
     }
     PATH = finalPath;
+    std::cout << "final path = " << finalPath << std::endl;
+
     return true;
 }
 

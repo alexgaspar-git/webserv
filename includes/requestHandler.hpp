@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <fstream>
+#include <dirent.h>
 
 #define HTTPVER "HTTP/1.1 "
 #define MTD _req["method"]

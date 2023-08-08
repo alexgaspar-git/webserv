@@ -1,40 +1,17 @@
 #include "CGIHandler.hpp"
 #include "utils.hpp"
 
-CGIHandler::CGIHandler(std::map<std::string, std::string> const &request, int type, std::map<std::string, int> &cookie) : _req(request), _body(), _path() {
+CGIHandler::CGIHandler(std::map<std::string, std::string> const &request, int type, std::map<std::string, int> &cookie) : _req(request), _body(), _path(), _cookie(cookie) {
     if (type == PY) {
-        _path = strdup("/usr/bin/python3");
+        _path = "/usr/bin/python3";
     } else {
-        _path = strdup("/usr/bin/php");
+        _path = "/usr/bin/php";
     }
-    _argv = getArgv();
-    _env = getEnv(cookie);
 };
 
-CGIHandler::~CGIHandler() {
-    delete[] _argv;
-    delete[] _env;
-}
+CGIHandler::~CGIHandler() {}
 
-const char** CGIHandler::getArgv() {
-    std::string py = "python3";
-    std::string php = "php";
-    std::string path;
-
-    const char** tmp = new const char*[3];
-    if (strcmp(_path, "/usr/bin/python3") == 0) {
-        tmp[0] = strdup(py.c_str());
-    } else {
-        tmp[0] = strdup(php.c_str());
-    }
-    path = extractPathString(_req["path"]);
-    tmp[1] = strdup(path.c_str());
-    tmp[2] = NULL;
-
-    return tmp;
-}
-
-const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
+void CGIHandler::getEnv(std::map<std::string, int> &cookie) {
     std::vector<std::string> tmp;
 
     if (_req["method"] == "GET") {
@@ -56,20 +33,16 @@ const char **CGIHandler::getEnv(std::map<std::string, int> &cookie) {
 
     if (_req["Cookie"].size() == 0) {
         tmp.push_back("NUMBER=0");
+        std::cout << "i rentre ici" << std::endl;
     } else {
         tmp.push_back("NUMBER=" + intToString(cookie[_req["Cookie"]]));
-        if (PATH.find("cookie") != std::string::npos)
-            cookie[_req["Cookie"]]++;
     }
-
-    const char** env = new const char*[tmp.size() + 1];
-    
+    _env = new char*[tmp.size() + 1];
     for (size_t i = 0; i < tmp.size(); i++) {
-        env[i] = strdup(tmp[i].c_str());
+        _env[i] = new char[(tmp[i].size()) + 1];
+        std::strcpy(_env[i], tmp[i].c_str());
     }
-    
-    env[tmp.size()] = NULL;
-    return env;
+    _env[tmp.size()] = NULL;
 }
 
 void stopCGISig() {
@@ -91,10 +64,30 @@ bool CGIHandler::execCGI() {
         closer(outPipe[0], outPipe[1], inPipe[0], inPipe[1]);
     } 
     if (pid == 0) {
-        dup2(outPipe[1], STDOUT_FILENO);
-        dup2(inPipe[0], STDIN_FILENO);
+        getEnv(_cookie);
+
+        if (dup2(outPipe[1], STDOUT_FILENO) == -1)
+            exit(1);
+        if (dup2(inPipe[0], STDIN_FILENO) == -1)
+            exit(1);
         closer(outPipe[0], outPipe[1], inPipe[0], inPipe[1]);
-        execve(_path, (char* const*)_argv, (char* const*)_env);
+
+        std::string py = "python3";
+        std::string php = "php";
+
+        char *tmp[3];
+
+        if (_path.compare("/usr/bin/python3") == 0) {
+            tmp[0] = (char *)py.c_str();
+        } else {
+            tmp[0] = (char *)php.c_str();
+        }
+        std::string path = extractPathString(_req["path"]);
+        tmp[1] = (char *)path.c_str();
+        tmp[2] = NULL;
+
+        execve(_path.c_str(), tmp, _env);
+        exit(1);
     } else {
         stopCGISig();
         close(outPipe[1]);
@@ -116,6 +109,8 @@ bool CGIHandler::execCGI() {
 }
 
 std::string CGIHandler::initCGI() {
+    if (PATH.find("cookie") != std::string::npos)
+        _cookie[_req["Cookie"]]++;
     if (!execCGI() || _body.empty()) {
         return "$#500 Internal Server Error";
     };
