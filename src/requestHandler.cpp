@@ -52,7 +52,6 @@ bool requestHandler::getFirstLine(std::string const &line) {
     }
     if (_req["path"].find("//") != std::string::npos)
         _badRequest = true;
-    std::cout << "first path = " << _req["path"] << std::endl;
     return true;
 }
 
@@ -83,12 +82,25 @@ bool requestHandler::handlePath() {
         std::map<std::string, s_location>::const_iterator defaultIt = locations.find("/");
         if (defaultIt != locations.end()) {
             const s_location &defaultLocation = defaultIt->second;
-            finalPath = defaultLocation.root + ((oldPath.length() == 1) ? defaultLocation.index : oldPath);
+            if (defaultLocation.index.empty()) {
+                if (defaultLocation.autoindex == "on") {
+                    _isAutoIndex = true;
+                } else {
+                    _isForbidden = true;
+                }
+            } else {
+                finalPath = defaultLocation.root + ((oldPath.length() == 1) ? defaultLocation.index : oldPath);
+            }
+            if (getExtension(finalPath) != HTML) {
+                if (defaultLocation.autoindex == "on") {
+                    _isAutoIndex = true;
+                } else {
+                    _isForbidden = true;
+                }
+            } 
         }
     }
     PATH = finalPath;
-    std::cout << "final path = " << finalPath << std::endl;
-
     return true;
 }
 

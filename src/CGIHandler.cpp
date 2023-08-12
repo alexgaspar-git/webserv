@@ -33,7 +33,6 @@ void CGIHandler::getEnv(std::map<std::string, int> &cookie) {
 
     if (_req["Cookie"].size() == 0) {
         tmp.push_back("NUMBER=0");
-        std::cout << "i rentre ici" << std::endl;
     } else {
         tmp.push_back("NUMBER=" + intToString(cookie[_req["Cookie"]]));
     }

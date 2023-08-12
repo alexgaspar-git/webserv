@@ -17,16 +17,13 @@ function indexDirectory($directory)
             }
         }
     }
-
     return $index;
 }
 
-// Usage example:
 $directoryToIndex = getenv('INDEXPATH');
 
 $index = indexDirectory($directoryToIndex);
 
-// Display the results
 echo "<h2>Autoindex of $directoryToIndex :</h2>";
 if (isset($index['directories'])) {
     foreach ($index['directories'] as $dir) {
