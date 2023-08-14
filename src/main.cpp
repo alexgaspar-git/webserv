@@ -3,11 +3,16 @@
 #include "../includes/ConfigParser.hpp"
 
 int main(int argc, char **argv) {
-	if (argc != 2) {
+	if (argc > 2) {
 		std::cerr << "./webserv [conf file]" << std::endl;
 		return 1;
 	}
-	std::ifstream input(argv[1]);
+	std::string name_conf;
+	if (argc == 2)
+		name_conf = argv[1];
+	else
+		name_conf = "conf/example.conf";
+	std::ifstream input(name_conf);
 	if (!input.is_open()) {
 		std::cout << ".conf file doesn't exist." << std::endl;
 		return (1);
