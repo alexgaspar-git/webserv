@@ -74,7 +74,7 @@ bool requestHandler::handlePath() {
         } else {
             continue;
         }
-        if (!checkMethod(locationData))
+        if (!checkMethod(locationData, finalPath))
             return false;
     }
 
@@ -104,8 +104,10 @@ bool requestHandler::handlePath() {
     return true;
 }
 
-bool requestHandler::checkMethod(const s_location &locationData) {
-    if (locationData.index == "/delete.py"
+bool requestHandler::checkMethod(const s_location &locationData, std::string finalPath) {
+    if (finalPath == "./www/images" && locationData.autoindex == "off") {
+        _isForbidden = true;
+    } else if (locationData.index == "/delete.py"
         && locationData.method.find("DELETE") == std::string::npos)
         return false;
     if (!locationData.redirect.empty()) {

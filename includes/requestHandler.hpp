@@ -51,7 +51,7 @@ public:
     std::string buildErrResponse(std::string const &body);
     std::string handleHTML(std::string const &path);
     bool defaultError(std::string const &errcode);
-    bool checkMethod(const s_location &locationData);
+    bool checkMethod(const s_location &locationData, std::string finalPath);
     std::vector<s_conf>::iterator getCurrentClient(ConfigParser *pars, int port);
     std::string const buildRedirResponse();
 };
