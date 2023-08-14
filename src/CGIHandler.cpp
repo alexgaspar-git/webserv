@@ -29,6 +29,11 @@ void CGIHandler::getEnv(std::map<std::string, int> &cookie) {
     tmp.push_back("CONTENT_LENGTH=" + intToString(_req["body"].size()));
     tmp.push_back("CONTENT_TYPE=" + _req["Content-Type"]);
     tmp.push_back("UPLOAD_DIR=./www/images/");
+    if (_req["autoindex"].empty()) {
+        tmp.push_back("NOINDEX=TRUE");
+    } else {
+        tmp.push_back("NOINDEX=FALSE");
+    }
     tmp.push_back("INDEXPATH=" + _req["autoindex"]);
 
     if (_req["Cookie"].size() == 0) {
@@ -110,8 +115,14 @@ bool CGIHandler::execCGI() {
 std::string CGIHandler::initCGI() {
     if (PATH.find("cookie") != std::string::npos)
         _cookie[_req["Cookie"]]++;
-    if (!execCGI() || _body.empty()) {
+    if (!execCGI())
         return "$#500 Internal Server Error";
-    };
+    if (_body.empty()) {
+        return "$#500 Internal Server Error";
+    } else if (_body == "$#404") {
+        return "$#404 Not Found";
+    } else if (_body == "$#403") {
+        return "$#403 Forbidden";
+    }
     return _body;
 }

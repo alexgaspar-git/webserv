@@ -1,6 +1,6 @@
 #include "../includes/requestHandler.hpp"
 
-requestHandler::requestHandler(std::string const request, ConfigParser *pars, int port) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false), _badRequest(false), _isHTTPS(false), _noCurrentClient(false) {
+requestHandler::requestHandler(std::string const request, ConfigParser *pars, int port) : _req(), _currentClient(), _sitePath("www"), _isForbidden(false), _isAutoIndex(false), _noRoot(false), _badRequest(false), _isHTTPS(false), _redirectCode(""), _redirectLink(""), _noCurrentClient(false) {
     std::istringstream iss(request);
     std::string line;
     std::string body;
@@ -158,18 +158,21 @@ std::string requestHandler::handleRequest() {
         return buildErrResponse("$#413 Payload Too Large");
     if (!handlePath())
         return buildErrResponse("$#405 Method Not Allowed");
+    if (_redirectCode != "")
+        return buildRedirResponse();
     if (_isForbidden)
         return buildErrResponse("$#403 Forbidden");
     if (_noRoot)
         return buildErrResponse("$#500 Internal Server Error");
-    if (_redirectCode != "")
-        return buildRedirResponse();
-    if (_isAutoIndex) {
-        _req["autoindex"] = PATH;
-        PATH = "./www/php/autoindex.php";
-    }
     int ext = getExtension(PATH);
+    if (_isAutoIndex) {
+        if (ext == OTHER) {
+            _req["autoindex"] = PATH;
+            PATH = "./www/php/autoindex.php";
+        }
+    }
     std::string body;
+    ext = getExtension(PATH);
     if (ext == PY || ext == PHP) {
         CGIHandler cgi(_req, ext, _currentClient->cookie);
         body = cgi.initCGI();

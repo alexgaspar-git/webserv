@@ -2,7 +2,7 @@
 function indexDirectory($directory)
 {
     if (!is_dir($directory)) {
-        die("Error: Not a valid directory.");
+        die("$#404");
     }
 
     $files = scandir($directory);
@@ -19,6 +19,11 @@ function indexDirectory($directory)
     }
     return $index;
 }
+
+$noindex = getenv('NOINDEX');
+
+if ($noindex == "TRUE")
+    die ("$#403");
 
 $directoryToIndex = getenv('INDEXPATH');
 
