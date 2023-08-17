@@ -1,2 +1,2 @@
 curl -X POST  http://localhost:8080/
-check struct event voir si pas overloads
+grave de pouvoir lancer le serv sans serveur name ?

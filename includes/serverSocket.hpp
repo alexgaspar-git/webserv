@@ -18,9 +18,9 @@ class serverSocket
 		sockaddr_in srvAdress;
 		socklen_t	addrlen;
 		int kqueue_fd;
-		struct kevent event;
 
 	public:
+		struct kevent event[50];
 		std::map<int, std::string> *_srvSocket;
 
 		serverSocket();

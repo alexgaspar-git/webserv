@@ -26,9 +26,9 @@ int main(int argc, char **argv) {
     srand(time(NULL));
 	if (srv.CreateSocket(&pars))
 		return (1);
+	struct kevent *events = srv.event;
 	while (1) {
 		int tmp_fd;
-		struct kevent events[50];
 		new_events = kevent(srv.getKqueue_fd(), NULL, 0, events, 50, NULL);
 		for (int i = 0; i < new_events; i++) {
 			tmp_fd = events[i].ident;

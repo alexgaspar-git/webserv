@@ -40,8 +40,10 @@ int serverSocket::CreateSocket(ConfigParser *pars) {
 		return(1);
 	}
 	for (std::vector<s_conf>::iterator it = pars->_config->begin(); it != pars->_config->end(); it++) {
-		if (!(port = translate_port(it->port)))
+		if (!(port = translate_port(it->port))) {
+			std::cout << "valid ports are between 1024 and 49151" << std::endl;
 			return (1);
+		}
 		this->srvskt = socket(AF_INET, SOCK_STREAM, 0);
 		if (this->srvskt == -1 ) {
 			std::cerr << "Failed to create socket." << std::endl;
@@ -66,8 +68,8 @@ int serverSocket::CreateSocket(ConfigParser *pars) {
 			close(this->srvskt);
 			return (1);
 		}
-		EV_SET(&this->event, this->srvskt, EVFILT_READ, EV_ADD, 0, 0, NULL);
-		if (kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL) == -1) {
+		EV_SET(this->event, this->srvskt, EVFILT_READ, EV_ADD, 0, 0, NULL);
+		if (kevent(this->kqueue_fd, this->event, 1, NULL, 0, NULL) == -1) {
 			std::cerr << "failed to register event." << std::endl;
 			close(this->srvskt);
 			return(1);
@@ -92,8 +94,8 @@ void serverSocket::create_request(int fd) {
 		close(clientSocket);
 		return;
 	}
-	EV_SET(&this->event, clientSocket, EVFILT_READ, EV_ADD, 0, 0, NULL);
-	if (kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL) == -1) {
+	EV_SET(this->event, clientSocket, EVFILT_READ, EV_ADD, 0, 0, NULL);
+	if (kevent(this->kqueue_fd, this->event, 1, NULL, 0, NULL) == -1) {
 		std::cerr << "failed to register event." << std::endl;
 		close(clientSocket);
 		return;
@@ -129,8 +131,8 @@ void serverSocket::handle_request(int clientSocket, ConfigParser *pars) {
 		else
 			std::cerr << "could not get port" << std::endl;
 	}
-	EV_SET(&this->event, clientSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-	int resultDelete = kevent(this->kqueue_fd, &this->event, 1, NULL, 0, NULL);
+	EV_SET(this->event, clientSocket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+	int resultDelete = kevent(this->kqueue_fd, this->event, 1, NULL, 0, NULL);
 	if (resultDelete == -1) {
 		std::cerr << "failed to delete event." << std::endl;
 	}
